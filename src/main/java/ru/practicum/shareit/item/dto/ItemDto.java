@@ -10,9 +10,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class ItemDto {
 
-    final long itemId;
-    final String name;
-    final String description;
-    final boolean isAvailable;
+    private final long itemId;
+    private final String name;
+    private final String description;
+    private short shareCounter;
+    private final boolean isAvailable;
 
 }

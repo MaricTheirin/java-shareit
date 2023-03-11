@@ -1,15 +1,17 @@
 package ru.practicum.shareit.item.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Item {
 
-    final long itemId;
-    final long ownerId;
-    String name;
-    String description;
-    short shareCounter = 0;
-    boolean isAvailable = true;
+    private final long itemId;
+    private final long ownerId;
+    private String name;
+    private String description;
+    private short shareCounter;
+    private boolean isAvailable = true;
 
 }

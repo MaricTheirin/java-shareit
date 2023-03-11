@@ -21,7 +21,9 @@ public class ItemDtoMapper {
                 itemDto.getItemId(),
                 userId,
                 itemDto.getName(),
-                itemDto.getDescription()
+                itemDto.getDescription(),
+                itemDto.getShareCounter(),
+                itemDto.isAvailable()
         );
     }
 
