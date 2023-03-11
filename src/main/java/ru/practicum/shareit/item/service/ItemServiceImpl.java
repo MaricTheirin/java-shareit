@@ -88,14 +88,14 @@ public class ItemServiceImpl implements ItemService {
 
     private void checkIfUserExist(Long userId) {
         if (!userRepository.isExist(userId)) {
-            log.debug("Владелец с id = {} не существует", userId);
+            log.warn("Владелец с id = {} не существует", userId);
             throw new UserNotFoundException("Ошибка при сохранении вещи - владелец не обнаружен");
         }
     }
 
     private void checkIfItemExist(Long itemId) {
         if (!itemRepository.isExist(itemId)) {
-            log.debug("Предмет с id = {} не существует", itemId);
+            log.warn("Предмет с id = {} не существует", itemId);
             throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не был добавлен ранее");
         }
     }
