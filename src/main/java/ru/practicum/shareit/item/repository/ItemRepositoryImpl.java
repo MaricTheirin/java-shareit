@@ -36,4 +36,9 @@ public class ItemRepositoryImpl implements ItemRepository {
     public Item deleteItem(Long userId, Long itemId) {
         return items.get(userId).remove(itemId);
     }
+
+    @Override
+    public boolean isExist(Long itemId) {
+        return items.containsKey(itemId);
+    }
 }

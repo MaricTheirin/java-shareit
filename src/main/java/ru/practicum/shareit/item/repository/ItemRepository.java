@@ -12,4 +12,6 @@ public interface ItemRepository {
 
     Item deleteItem(Long userId, Long itemId);
 
+    boolean isExist(Long itemId);
+
 }
