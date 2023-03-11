@@ -13,7 +13,6 @@ public class ItemDto {
     final long itemId;
     final String name;
     final String description;
-    short shareCounter = 0;
-    boolean isAvailable;
+    final boolean isAvailable;
 
 }
