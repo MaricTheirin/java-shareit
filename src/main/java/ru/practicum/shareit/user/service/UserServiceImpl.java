@@ -5,9 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoMapper;
+import ru.practicum.shareit.user.exception.UserAlreadyExistException;
+import ru.practicum.shareit.user.exception.UserCreationException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -47,9 +52,10 @@ public class UserServiceImpl implements UserService {
         log.debug("Запрошено обновление пользователя с id = {}", userDto);
         checkBeforeUpdate(userId, userDto);
 
-        User updatedUser = userRepository.updateUser(userDtoMapper.mapDtoToUser(userId, userDto));
-        log.trace("Обновлённый пользователь: {}", updatedUser);
-        return userDtoMapper.mapUserToDto(updatedUser);
+        User updatedUser = getUserWithUpdatedFields(userId, userDto);
+        User savedUser = userRepository.updateUser(updatedUser);
+        log.trace("Пользователь обновлён. Сохранённое значение: {}", savedUser);
+        return userDtoMapper.mapUserToDto(savedUser);
     }
 
     @Override
@@ -62,12 +68,32 @@ public class UserServiceImpl implements UserService {
         return userDtoMapper.mapUserToDto(requestedUser);
     }
 
-    private void checkBeforeSave(UserDto userDto) {
+    @Override
+    public List<UserDto> readAllUsers() {
+        log.debug("Запрошен список всех пользователей");
+        List<UserDto> users =
+                userRepository.getAllUsers().stream().map(userDtoMapper::mapUserToDto).collect(Collectors.toList());
+        log.trace("Полученное значение: {}", users);
+        return users;
+    }
 
+    private void checkBeforeSave(UserDto userDto) {
+        if (userDto.getEmail() == null) {
+            String errorMessage = "Невозможно сохранить пользователя с пустым email";
+            log.warn(errorMessage);
+            throw new UserCreationException(errorMessage);
+        }
+        if (userDto.getName() == null) {
+            String errorMessage = "Невозможно сохранить пользователя с пустым именем";
+            log.warn(errorMessage);
+            throw new UserCreationException(errorMessage);
+        }
+        checkIfEmailExist(userDto.getEmail());
     }
 
     private void checkBeforeUpdate(Long userId, UserDto userDto) {
         checkIfUserExist(userId);
+        checkIfEmailExist(userDto.getEmail());
     }
 
     private void checkIfUserExist(Long userId) {
@@ -77,4 +103,45 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    private void checkIfEmailExist(String email) {
+        if (userRepository.isExist(email)) {
+            log.warn("Пользователь с email = {} уже существует", email);
+            throw new UserAlreadyExistException("Пользователь с таким email уже существует");
+        }
+    }
+
+    private User getUserWithUpdatedFields(Long savedUserId, UserDto userUpdatedDto) {
+        log.debug("Обновление пользователя с id {} данными из DTO: {}", savedUserId, userUpdatedDto);
+
+        User savedUser = userRepository.getUser(savedUserId);
+        User.UserBuilder builder = User.builder().id(savedUserId);
+
+        if (userUpdatedDto.getEmail() != null) {
+            builder.email(userUpdatedDto.getEmail());
+            log.debug(
+                    "У пользователя {} изменён email. Старое значение - {}, новое значение - {}",
+                    savedUser,
+                    savedUser.getEmail(),
+                    userUpdatedDto.getEmail()
+            );
+        } else {
+            builder.email(savedUser.getEmail());
+        }
+
+        if (userUpdatedDto.getName() != null) {
+            builder.name(userUpdatedDto.getName());
+            log.debug(
+                    "У пользователя {} измено имя. Старое значение - {}, новое значение - {}",
+                    savedUser,
+                    savedUser.getName(),
+                    userUpdatedDto.getName()
+            );
+        } else {
+            builder.name(savedUser.getName());
+        }
+
+        User updatedUser = builder.build();
+        log.trace("Обновлённый пользователь: {}", updatedUser);
+        return updatedUser;
+    }
 }
