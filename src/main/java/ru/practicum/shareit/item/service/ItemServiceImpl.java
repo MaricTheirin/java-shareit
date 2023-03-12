@@ -83,7 +83,7 @@ public class ItemServiceImpl implements ItemService {
 
     private void checkBeforeUpdate(Long userId, ItemDto itemDto) {
         checkIfUserExist(userId);
-        checkIfItemExist(itemDto.getItemId());
+        checkIfItemExist(itemDto.getId());
     }
 
     private void checkIfUserExist(Long userId) {
