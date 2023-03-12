@@ -7,11 +7,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class Item {
 
-    private final long itemId;
+    private long itemId;
     private final long ownerId;
     private String name;
     private String description;
     private short shareCounter;
-    private boolean isAvailable = true;
+    private boolean available;
 
 }

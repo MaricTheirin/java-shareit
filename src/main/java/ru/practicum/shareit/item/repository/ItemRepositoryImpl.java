@@ -9,10 +9,12 @@ import java.util.Map;
 public class ItemRepositoryImpl implements ItemRepository {
 
     private final Map<Long, Map<Long, Item>> items = new HashMap<>();
+    private long lastItemId = 0;
 
     @Override
     public Item saveItem(Item item) {
         long ownerId = item.getOwnerId();
+        item.setItemId(++lastItemId);
         if (!items.containsKey(ownerId)) {
             items.put(ownerId, new HashMap<>());
         }
