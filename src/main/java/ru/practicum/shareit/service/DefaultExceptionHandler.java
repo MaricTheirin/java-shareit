@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.practicum.shareit.service.exception.ShareItException;
 import javax.servlet.http.HttpServletRequest;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
@@ -26,7 +27,13 @@ public class DefaultExceptionHandler {
             MethodArgumentNotValidException exception,
             HttpServletRequest request
     ) {
-        return new ResponseEntity<>(new ExceptionMessage(exception, request.getRequestURI()), HttpStatus.BAD_REQUEST);
+        String errorMessage = exception.getFieldErrors().stream()
+                .map(error -> "'" + error.getField() + "': " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return new ResponseEntity<>(
+                new ExceptionMessage("Ошибка при проверке полей: " + errorMessage, request.getRequestURI()),
+                HttpStatus.BAD_REQUEST
+        );
     }
 
 

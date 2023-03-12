@@ -14,6 +14,12 @@ public class ExceptionMessage {
         this.path = path;
     }
 
+    public ExceptionMessage(String message, String path) {
+        this.message = message;
+        this.localDateTime = LocalDateTime.now();
+        this.path = path;
+    }
+
     public String getMessage() {
         return message;
     }
