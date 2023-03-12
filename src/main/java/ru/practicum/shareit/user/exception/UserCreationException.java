@@ -1,6 +1,8 @@
 package ru.practicum.shareit.user.exception;
 
-public class UserCreationException extends RuntimeException {
+import ru.practicum.shareit.service.exception.CreationException;
+
+public class UserCreationException extends CreationException {
 
     public UserCreationException(String message) {
         super(message);
