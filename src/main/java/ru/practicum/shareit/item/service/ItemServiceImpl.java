@@ -31,11 +31,9 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Для пользователя с id = {} добавляется новый объект: {}", userId, itemDto);
         checkBeforeSave(userId, itemDto);
 
-        Item newItem = itemDtoMapper.mapDtoToItem(userId, itemDto);
-        log.trace("Выполнено преобразование объекта из DTO в: {}", newItem);
-        itemRepository.saveItem(newItem);
-        log.trace("Сохранение объекта завершено");
-        return itemDto;
+        Item savedItem = itemRepository.saveItem(itemDtoMapper.mapDtoToItem(userId, itemDto));
+        log.trace("Сохранённый предмет: {}", savedItem);
+        return itemDtoMapper.mapItemToDto(savedItem);
     }
 
     @Override
