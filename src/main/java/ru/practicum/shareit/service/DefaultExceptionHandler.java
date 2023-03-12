@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.practicum.shareit.service.exception.ShareItException;
@@ -36,14 +37,14 @@ public class DefaultExceptionHandler {
         );
     }
 
-
-    @ExceptionHandler({Throwable.class})
-    protected ResponseEntity<ExceptionMessage> handleException (
-            Throwable exception,
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    protected ResponseEntity<ExceptionMessage> handleMissingRequestHeaderException(
+            MissingRequestHeaderException exception,
             HttpServletRequest request
     ) {
         return new ResponseEntity<>(
-                new ExceptionMessage(exception, request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR
+                new ExceptionMessage("Нарушение безопасности", request.getRequestURI()),
+                HttpStatus.BAD_REQUEST
         );
     }
 
