@@ -93,7 +93,6 @@ public class UserServiceImpl implements UserService {
 
     private void checkBeforeUpdate(Long userId, UserDto userDto) {
         checkIfUserExist(userId);
-        checkIfEmailExist(userDto.getEmail());
     }
 
     private void checkIfUserExist(Long userId) {
@@ -115,6 +114,10 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.getUser(savedUserId);
         User.UserBuilder builder = User.builder().id(savedUserId);
+
+        if (!savedUser.getEmail().equals(userUpdatedDto.getEmail())) {
+            checkIfEmailExist(userUpdatedDto.getEmail());
+        }
 
         if (userUpdatedDto.getEmail() != null) {
             builder.email(userUpdatedDto.getEmail());
