@@ -18,7 +18,7 @@ public class ItemDtoMapper {
 
     public Item mapDtoToItem (Long userId, ItemDto itemDto) {
         return new Item(
-                itemDto.getItemId(),
+                itemDto.getId(),
                 userId,
                 itemDto.getName(),
                 itemDto.getDescription(),
