@@ -50,7 +50,7 @@ public class DefaultExceptionHandler {
 
 
     @ExceptionHandler({Throwable.class})
-    protected ResponseEntity<ExceptionMessage> handleException (
+    protected ResponseEntity<ExceptionMessage> handleException(
             Throwable exception,
             HttpServletRequest request
     ) {
