@@ -1,12 +1,13 @@
 package ru.practicum.shareit.item.repository;
 
 import ru.practicum.shareit.item.model.Item;
+import java.util.List;
 
 public interface ItemRepository {
 
     Item saveItem(Item item);
 
-    Item getItem(Long userId, Long itemId);
+    Item getItem(Long itemId);
 
     Item updateItem(Item item);
 
@@ -17,5 +18,7 @@ public interface ItemRepository {
     List<Item> getAvailableItems (String searchQuery);
 
     boolean isExist(Long itemId);
+
+    boolean isExistAndBelongsToUser(Long userId, Long itemId);
 
 }

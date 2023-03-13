@@ -12,7 +12,7 @@ public class ItemDtoMapper {
 
     public ItemDto mapItemToDto (Item item) {
         ItemDto mappedDto = new ItemDto(
-                item.getItemId(),
+                item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getShareCounter(),
@@ -29,7 +29,7 @@ public class ItemDtoMapper {
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getShareCounter(),
-                itemDto.isAvailable()
+                itemDto.getAvailable()
         );
         log.trace(OBJECT_MAPPED_MESSAGE, itemDto, mappedItem);
         return mappedItem;

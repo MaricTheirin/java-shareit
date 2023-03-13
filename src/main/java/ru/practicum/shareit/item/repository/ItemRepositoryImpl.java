@@ -1,9 +1,11 @@
 package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
@@ -14,23 +16,33 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public Item saveItem(Item item) {
         long ownerId = item.getOwnerId();
-        item.setItemId(++lastItemId);
+        item.setId(++lastItemId);
         if (!items.containsKey(ownerId)) {
             items.put(ownerId, new HashMap<>());
         }
 
-        items.get(ownerId).put(item.getItemId(), item);
+        items.get(ownerId).put(item.getId(), item);
         return item;
     }
 
     @Override
-    public Item getItem(Long userId, Long itemId) {
-        return items.get(userId).get(itemId);
+    public Item getItem(Long itemId) {
+        Optional<Item> item = items.values().stream()
+                .map(Map::values)
+                .flatMap(Collection::stream)
+                .filter(elem -> elem.getId() == itemId)
+                .findFirst();
+
+        if (item.isPresent()) {
+            return item.get();
+        } else {
+            throw new ItemNotFoundException("Запрошенная вещь не существует");
+        }
     }
 
     @Override
     public Item updateItem(Item item) {
-        items.get(item.getOwnerId()).put(item.getItemId(), item);
+        items.get(item.getOwnerId()).put(item.getId(), item);
         return item;
     }
 
@@ -69,4 +81,10 @@ public class ItemRepositoryImpl implements ItemRepository {
     public boolean isExist(Long itemId) {
         return items.containsKey(itemId);
     }
+
+    @Override
+    public boolean isExistAndBelongsToUser(Long userId, Long itemId) {
+        return items.getOrDefault(userId, Collections.emptyMap()).containsKey(itemId);
+    }
+
 }

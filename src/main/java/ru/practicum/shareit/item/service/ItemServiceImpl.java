@@ -10,6 +10,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.repository.UserRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,32 +40,28 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto readItem(Long userId, Long itemId) {
-        log.debug("Для пользователя с id = {} запрошен объект с id = {}", userId, itemId);
-        Item resultItem = itemRepository.getItem(userId, itemId);
+        log.debug("Пользователь с id = {} запросил объект с id = {}", userId, itemId);
+        Item resultItem = itemRepository.getItem(itemId);
         log.trace("Найден объект {}", resultItem);
         return itemDtoMapper.mapItemToDto(resultItem);
     }
 
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
-        log.debug("Для пользователя с id = {} добавляется новый объект: {}", userId, itemDto);
-        checkBeforeUpdate(userId, itemDto);
+        log.debug("Запрошено обновление объекта с id = {} ({}) для пользователя с id = {}", itemId, itemDto, userId);
+        checkBeforeUpdate(userId, itemId);
 
-        Item oldItem = itemRepository.getItem(userId, itemId);
-        log.trace("Старый объект: {}", oldItem);
-        Item updatedItem = itemDtoMapper.mapDtoToItem(userId, itemDto);
-        updatedItem.setShareCounter(oldItem.getShareCounter());
-        log.trace("Новый объект: {}",updatedItem);
-        itemRepository.updateItem(updatedItem);
-        log.trace("Обновление завершено");
-        return itemDtoMapper.mapItemToDto(updatedItem);
+        Item updatedItem = getItemWithUpdatedFields(userId, itemId, itemDto);
+        Item savedItem = itemRepository.updateItem(updatedItem);
+        log.trace("Сохранённый предмет: {}", savedItem);
+        return itemDtoMapper.mapItemToDto(savedItem);
     }
 
     @Override
     public ItemDto deleteItem(Long userId, Long itemId) {
         log.debug("Для пользователя с id = {} удаляется предмет с id = {}", userId, itemId);
         checkIfUserExist(userId);
-        checkIfItemExist(itemId);
+        checkIfItemExist(userId, itemId);
 
         Item deletedItem = itemRepository.deleteItem(userId, itemId);
         log.trace("Выполнено удаление предмета: {}", deletedItem);
@@ -93,9 +91,9 @@ public class ItemServiceImpl implements ItemService {
         checkIfUserExist(userId);
     }
 
-    private void checkBeforeUpdate(Long userId, ItemDto itemDto) {
+    private void checkBeforeUpdate(Long userId, Long itemId) {
         checkIfUserExist(userId);
-        checkIfItemExist(itemDto.getId());
+        checkIfItemExist(userId, itemId);
     }
 
     private void checkIfUserExist(Long userId) {
@@ -105,11 +103,58 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private void checkIfItemExist(Long itemId) {
-        if (!itemRepository.isExist(itemId)) {
-            log.warn("Предмет с id = {} не существует", itemId);
+    private void checkIfItemExist(Long userId, Long itemId) {
+        if (!itemRepository.isExistAndBelongsToUser(userId, itemId)) {
+            log.warn("Предмет с id = {} не существует или не принадлежит пользователю с id = {}", itemId, userId);
             throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не был добавлен ранее");
         }
+    }
+
+    private Item getItemWithUpdatedFields(Long ownerUserId, Long savedItemId, ItemDto updatedItemDto) {
+        log.debug("Обновление вещи с id {} данными из DTO: {}", savedItemId, updatedItemDto);
+
+        Item savedItem = itemRepository.getItem(savedItemId);
+        Item.ItemBuilder builder = Item.builder().id(savedItemId).ownerId(ownerUserId);
+
+        if (updatedItemDto.getName() != null) {
+            builder.name(updatedItemDto.getName());
+            log.debug(
+                    "У вещи {} изменёно наименование. Старое значение - {}, новое значение - {}",
+                    updatedItemDto,
+                    savedItem.getName(),
+                    updatedItemDto.getName()
+            );
+        } else {
+            builder.name(savedItem.getName());
+        }
+
+        if (updatedItemDto.getDescription() != null) {
+            builder.description(updatedItemDto.getDescription());
+            log.debug(
+                    "У вещи {} изменёно описание. Старое значение - {}, новое значение - {}",
+                    savedItem,
+                    savedItem.getDescription(),
+                    updatedItemDto.getDescription()
+            );
+        } else {
+            builder.description(savedItem.getDescription());
+        }
+
+        if (updatedItemDto.getAvailable() != null) {
+            builder.available(updatedItemDto.getAvailable());
+            log.debug(
+                    "У вещи {} изменена доступность. Старое значение - {}, новое значение - {}",
+                    savedItem,
+                    savedItem.isAvailable(),
+                    updatedItemDto.getAvailable()
+
+            );
+        } else {
+            builder.available(savedItem.isAvailable());
+        }
+        Item updatedItem = builder.build();
+        log.trace("Обновлённая вещь: {}", updatedItem);
+        return updatedItem;
     }
 
 }
