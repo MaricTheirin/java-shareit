@@ -8,9 +8,9 @@ import ru.practicum.shareit.item.model.Item;
 @Component
 public class ItemDtoMapper {
 
-    private final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
+    private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
 
-    public ItemDto mapItemToDto (Item item) {
+    public ItemDto mapItemToDto(Item item) {
         ItemDto mappedDto = new ItemDto(
                 item.getId(),
                 item.getName(),
@@ -22,7 +22,7 @@ public class ItemDtoMapper {
         return mappedDto;
     }
 
-    public Item mapDtoToItem (Long userId, ItemDto itemDto) {
+    public Item mapDtoToItem(Long userId, ItemDto itemDto) {
         Item mappedItem = new Item(
                 itemDto.getId(),
                 userId,

@@ -57,7 +57,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public List<Item> getAvailableItems (String searchQuery) {
+    public List<Item> getAvailableItems(String searchQuery) {
 
         if (searchQuery.length() == 0) {
             return Collections.emptyList();

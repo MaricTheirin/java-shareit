@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     private final UserDtoMapper userDtoMapper;
 
     @Autowired
-    public UserServiceImpl (UserRepository userRepository, UserDtoMapper userDtoMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserDtoMapper userDtoMapper) {
         this.userRepository = userRepository;
         this.userDtoMapper = userDtoMapper;
     }

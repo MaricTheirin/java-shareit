@@ -15,7 +15,7 @@ public interface ItemRepository {
 
     List<Item> getAllItems(Long userId);
 
-    List<Item> getAvailableItems (String searchQuery);
+    List<Item> getAvailableItems(String searchQuery);
 
     boolean isExist(Long itemId);
 

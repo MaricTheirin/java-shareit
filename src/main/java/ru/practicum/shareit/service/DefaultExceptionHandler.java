@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class DefaultExceptionHandler {
 
     @ExceptionHandler({ShareItException.class})
-    protected ResponseEntity<ExceptionMessage> handleShareItExceptions (
+    protected ResponseEntity<ExceptionMessage> handleShareItExceptions(
             ShareItException exception,
             HttpServletRequest request
     ) {
@@ -45,6 +45,17 @@ public class DefaultExceptionHandler {
         return new ResponseEntity<>(
                 new ExceptionMessage("Нарушение безопасности", request.getRequestURI()),
                 HttpStatus.BAD_REQUEST
+        );
+    }
+
+
+    @ExceptionHandler({Throwable.class})
+    protected ResponseEntity<ExceptionMessage> handleException (
+            Throwable exception,
+            HttpServletRequest request
+    ) {
+        return new ResponseEntity<>(
+                new ExceptionMessage(exception, request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
 
