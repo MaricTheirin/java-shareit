@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.exception.UserCreationException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
