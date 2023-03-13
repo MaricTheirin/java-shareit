@@ -40,6 +40,32 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
+    public List<Item> getAllItems(Long userId) {
+        return new ArrayList<>(items.getOrDefault(userId, Collections.emptyMap()).values());
+    }
+
+    @Override
+    public List<Item> getAvailableItems (String searchQuery) {
+
+        if (searchQuery.length() == 0) {
+            return Collections.emptyList();
+        }
+
+        String lowerCaseQuery = searchQuery.toLowerCase();
+        Predicate<Item> itemFilter = item ->
+                item.isAvailable() && (
+                        item.getName().toLowerCase().contains(lowerCaseQuery) ||
+                        item.getDescription().toLowerCase().contains(lowerCaseQuery)
+        );
+
+        return items.values().stream()
+                .map(Map::values)
+                .flatMap(Collection::stream)
+                .filter(itemFilter)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public boolean isExist(Long itemId) {
         return items.containsKey(itemId);
     }

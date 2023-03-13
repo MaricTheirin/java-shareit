@@ -12,7 +12,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @Autowired
-    private ItemController(ItemService itemService) {
+    public ItemController(ItemService itemService) {
         this.itemService = itemService;
     }
 
@@ -35,13 +35,20 @@ public class ItemController {
         return itemService.updateItem(userId, itemId, itemDto);
     }
 
+    @GetMapping
+    public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemService.readAllItems(userId);
+    }
+
     @DeleteMapping("/{itemId}")
     public ItemDto deleteItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
         return itemService.deleteItem(userId, itemId);
     }
 
     @GetMapping("/search")
-    public ItemDto findRentAvailableItems(@RequestParam("text") String text) {
+    public List<ItemDto> findRentAvailableItems(
+            @RequestParam("text") String text
+    ) {
         return itemService.findAvailableItems(text);
     }
 

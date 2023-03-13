@@ -71,8 +71,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto findAvailableItems(String text) {
-        return null;
+    public List<ItemDto> readAllItems(Long userId) {
+        log.debug("Для пользователя с id = {} запрошен список всех предметов", userId);
+        checkIfUserExist(userId);
+
+        List<Item> allUserItems = itemRepository.getAllItems(userId);
+        log.trace("Получен массив предметов: {}", allUserItems);
+        return allUserItems.stream().map(itemDtoMapper::mapItemToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemDto> findAvailableItems(String searchQuery) {
+        log.debug("Запрошен поиск всех доступных вещей, содержащих '{}'", searchQuery);
+
+        List<Item> foundItems = itemRepository.getAvailableItems(searchQuery);
+        log.trace("Найденные вещи: {}", foundItems);
+        return foundItems.stream().map(itemDtoMapper::mapItemToDto).collect(Collectors.toList());
     }
 
     private void checkBeforeSave(Long userId, ItemDto itemDto) {

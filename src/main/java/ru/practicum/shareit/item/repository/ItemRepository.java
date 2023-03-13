@@ -12,6 +12,10 @@ public interface ItemRepository {
 
     Item deleteItem(Long userId, Long itemId);
 
+    List<Item> getAllItems(Long userId);
+
+    List<Item> getAvailableItems (String searchQuery);
+
     boolean isExist(Long itemId);
 
 }
