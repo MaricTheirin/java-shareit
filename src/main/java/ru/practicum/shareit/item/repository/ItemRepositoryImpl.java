@@ -70,21 +70,25 @@ public class ItemRepositoryImpl implements ItemRepository {
                         item.getDescription().toLowerCase().contains(lowerCaseQuery)
         );
 
-        return items.values().stream()
-                .map(Map::values)
-                .flatMap(Collection::stream)
-                .filter(itemFilter)
-                .collect(Collectors.toList());
+        return getFlatItemsList(itemFilter);
     }
 
     @Override
     public boolean isExist(Long itemId) {
-        return items.containsKey(itemId);
+        return getFlatItemsList(item -> item.getId() == itemId).stream().findFirst().isPresent();
     }
 
     @Override
     public boolean isExistAndBelongsToUser(Long userId, Long itemId) {
         return items.getOrDefault(userId, Collections.emptyMap()).containsKey(itemId);
+    }
+
+    private List<Item> getFlatItemsList(Predicate<Item> itemFilter) {
+        return items.values().stream()
+                .map(Map::values)
+                .flatMap(Collection::stream)
+                .filter(itemFilter)
+                .collect(Collectors.toList());
     }
 
 }
