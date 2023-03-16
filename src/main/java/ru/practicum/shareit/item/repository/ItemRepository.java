@@ -5,17 +5,17 @@ import java.util.List;
 
 public interface ItemRepository {
 
-    Item saveItem(Item item);
+    Item save(Item item);
 
-    Item getItem(Long itemId);
+    Item get(Long itemId);
 
-    Item updateItem(Item item);
+    Item update(Item item);
 
-    Item deleteItem(Long userId, Long itemId);
+    Item delete(Long userId, Long itemId);
 
-    List<Item> getAllItems(Long userId);
+    List<Item> findAll(Long userId);
 
-    List<Item> getAvailableItems(String searchQuery);
+    List<Item> findAvailable(String searchQuery);
 
     boolean isExist(Long itemId);
 

@@ -6,15 +6,15 @@ import java.util.List;
 
 public interface UserRepository {
 
-    User saveUser(User user);
+    User save(User user);
 
-    User getUser(Long userId);
+    User get(Long userId);
 
-    User updateUser(User user);
+    User update(User user);
 
-    User deleteUser(Long userId);
+    User delete(Long userId);
 
-    List<User> getAllUsers();
+    List<User> findAll();
 
     boolean isExist(Long userId);
 

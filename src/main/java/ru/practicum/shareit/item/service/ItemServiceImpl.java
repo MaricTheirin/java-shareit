@@ -29,60 +29,60 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto createItem(Long userId, ItemDto itemDto) {
+    public ItemDto create(Long userId, ItemDto itemDto) {
         log.debug("Для пользователя с id = {} добавляется новый объект: {}", userId, itemDto);
         checkBeforeSave(userId, itemDto);
 
-        Item savedItem = itemRepository.saveItem(itemDtoMapper.mapDtoToItem(userId, itemDto));
+        Item savedItem = itemRepository.save(itemDtoMapper.mapDtoToItem(userId, itemDto));
         log.trace("Сохранённый предмет: {}", savedItem);
         return itemDtoMapper.mapItemToDto(savedItem);
     }
 
     @Override
-    public ItemDto readItem(Long userId, Long itemId) {
+    public ItemDto read(Long userId, Long itemId) {
         log.debug("Пользователь с id = {} запросил объект с id = {}", userId, itemId);
-        Item resultItem = itemRepository.getItem(itemId);
+        Item resultItem = itemRepository.get(itemId);
         log.trace("Найден объект {}", resultItem);
         return itemDtoMapper.mapItemToDto(resultItem);
     }
 
     @Override
-    public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
+    public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
         log.debug("Запрошено обновление объекта с id = {} ({}) для пользователя с id = {}", itemId, itemDto, userId);
         checkBeforeUpdate(userId, itemId);
 
         Item updatedItem = getItemWithUpdatedFields(userId, itemId, itemDto);
-        Item savedItem = itemRepository.updateItem(updatedItem);
+        Item savedItem = itemRepository.update(updatedItem);
         log.trace("Сохранённый предмет: {}", savedItem);
         return itemDtoMapper.mapItemToDto(savedItem);
     }
 
     @Override
-    public ItemDto deleteItem(Long userId, Long itemId) {
+    public ItemDto delete(Long userId, Long itemId) {
         log.debug("Для пользователя с id = {} удаляется предмет с id = {}", userId, itemId);
         checkIfUserExist(userId);
         checkIfItemExist(userId, itemId);
 
-        Item deletedItem = itemRepository.deleteItem(userId, itemId);
+        Item deletedItem = itemRepository.delete(userId, itemId);
         log.trace("Выполнено удаление предмета: {}", deletedItem);
         return itemDtoMapper.mapItemToDto(deletedItem);
     }
 
     @Override
-    public List<ItemDto> readAllItems(Long userId) {
+    public List<ItemDto> findAll(Long userId) {
         log.debug("Для пользователя с id = {} запрошен список всех предметов", userId);
         checkIfUserExist(userId);
 
-        List<Item> allUserItems = itemRepository.getAllItems(userId);
+        List<Item> allUserItems = itemRepository.findAll(userId);
         log.trace("Получен массив предметов: {}", allUserItems);
         return allUserItems.stream().map(itemDtoMapper::mapItemToDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> findAvailableItems(String searchQuery) {
+    public List<ItemDto> findAvailable(String searchQuery) {
         log.debug("Запрошен поиск всех доступных вещей, содержащих '{}'", searchQuery);
 
-        List<Item> foundItems = itemRepository.getAvailableItems(searchQuery);
+        List<Item> foundItems = itemRepository.findAvailable(searchQuery);
         log.trace("Найденные вещи: {}", foundItems);
         return foundItems.stream().map(itemDtoMapper::mapItemToDto).collect(Collectors.toList());
     }
@@ -113,7 +113,7 @@ public class ItemServiceImpl implements ItemService {
     private Item getItemWithUpdatedFields(Long ownerUserId, Long savedItemId, ItemDto updatedItemDto) {
         log.debug("Обновление вещи с id {} данными из DTO: {}", savedItemId, updatedItemDto);
 
-        Item savedItem = itemRepository.getItem(savedItemId);
+        Item savedItem = itemRepository.get(savedItemId);
         Item.ItemBuilder builder = Item.builder().id(savedItemId).ownerId(ownerUserId);
 
         if (updatedItemDto.getName() != null) {

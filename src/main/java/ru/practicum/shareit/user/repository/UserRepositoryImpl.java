@@ -14,30 +14,30 @@ public class UserRepositoryImpl implements UserRepository {
     private Long lastUserId = 0L;
 
     @Override
-    public User saveUser(User user) {
+    public User save(User user) {
         user.setId(++lastUserId);
         users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User getUser(Long userId) {
+    public User get(Long userId) {
         return users.get(userId);
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User deleteUser(Long userId) {
+    public User delete(Long userId) {
         return users.remove(userId);
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> findAll() {
         return new ArrayList<>(users.values());
     }
 

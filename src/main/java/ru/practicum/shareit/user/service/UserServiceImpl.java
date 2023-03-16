@@ -27,51 +27,51 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto create(UserDto userDto) {
         log.debug("Запрошено сохранение пользователя: {}", userDto);
         checkBeforeSave(userDto);
 
-        User savedUser = userRepository.saveUser(userDtoMapper.mapDtoToUser(userDto));
+        User savedUser = userRepository.save(userDtoMapper.mapDtoToUser(userDto));
         log.trace("Сохранённый пользователь: {}", savedUser);
         return userDtoMapper.mapUserToDto(savedUser);
     }
 
     @Override
-    public UserDto readUser(Long userId) {
+    public UserDto read(Long userId) {
         log.debug("Запрошен пользователь с id = {}", userId);
         checkIfUserExist(userId);
 
-        User requestedUser = userRepository.getUser(userId);
+        User requestedUser = userRepository.get(userId);
         log.trace("Найден пользователь: {}", requestedUser);
         return userDtoMapper.mapUserToDto(requestedUser);
     }
 
     @Override
-    public UserDto updateUser(Long userId, UserDto userDto) {
+    public UserDto update(Long userId, UserDto userDto) {
         log.debug("Запрошено обновление пользователя с id = {}", userDto);
         checkBeforeUpdate(userId, userDto);
 
         User updatedUser = getUserWithUpdatedFields(userId, userDto);
-        User savedUser = userRepository.updateUser(updatedUser);
+        User savedUser = userRepository.update(updatedUser);
         log.trace("Пользователь обновлён. Сохранённое значение: {}", savedUser);
         return userDtoMapper.mapUserToDto(savedUser);
     }
 
     @Override
-    public UserDto deleteUser(Long userId) {
+    public UserDto delete(Long userId) {
         log.debug("Запрошено удаление пользователя с id = {}", userId);
         checkIfUserExist(userId);
 
-        User requestedUser = userRepository.deleteUser(userId);
+        User requestedUser = userRepository.delete(userId);
         log.trace("Удалён пользователь: {}", requestedUser);
         return userDtoMapper.mapUserToDto(requestedUser);
     }
 
     @Override
-    public List<UserDto> readAllUsers() {
+    public List<UserDto> findAll() {
         log.debug("Запрошен список всех пользователей");
         List<UserDto> users =
-                userRepository.getAllUsers().stream().map(userDtoMapper::mapUserToDto).collect(Collectors.toList());
+                userRepository.findAll().stream().map(userDtoMapper::mapUserToDto).collect(Collectors.toList());
         log.trace("Полученное значение: {}", users);
         return users;
     }
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
     private User getUserWithUpdatedFields(Long savedUserId, UserDto userUpdatedDto) {
         log.debug("Обновление пользователя с id {} данными из DTO: {}", savedUserId, userUpdatedDto);
 
-        User savedUser = userRepository.getUser(savedUserId);
+        User savedUser = userRepository.get(savedUserId);
         User.UserBuilder builder = User.builder().id(savedUserId);
 
         if (!savedUser.getEmail().equals(userUpdatedDto.getEmail())) {

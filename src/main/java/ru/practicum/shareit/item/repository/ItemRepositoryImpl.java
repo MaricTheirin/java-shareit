@@ -14,7 +14,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     private long lastItemId = 0;
 
     @Override
-    public Item saveItem(Item item) {
+    public Item save(Item item) {
         long ownerId = item.getOwnerId();
         item.setId(++lastItemId);
         if (!items.containsKey(ownerId)) {
@@ -26,7 +26,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Item getItem(Long itemId) {
+    public Item get(Long itemId) {
         Optional<Item> item = items.values().stream()
                 .map(Map::values)
                 .flatMap(Collection::stream)
@@ -41,23 +41,23 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Item updateItem(Item item) {
+    public Item update(Item item) {
         items.get(item.getOwnerId()).put(item.getId(), item);
         return item;
     }
 
     @Override
-    public Item deleteItem(Long userId, Long itemId) {
+    public Item delete(Long userId, Long itemId) {
         return items.get(userId).remove(itemId);
     }
 
     @Override
-    public List<Item> getAllItems(Long userId) {
+    public List<Item> findAll(Long userId) {
         return new ArrayList<>(items.getOrDefault(userId, Collections.emptyMap()).values());
     }
 
     @Override
-    public List<Item> getAvailableItems(String searchQuery) {
+    public List<Item> findAvailable(String searchQuery) {
 
         if (searchQuery.length() == 0) {
             return Collections.emptyList();

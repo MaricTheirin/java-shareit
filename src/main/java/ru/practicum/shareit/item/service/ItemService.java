@@ -5,16 +5,16 @@ import java.util.List;
 
 public interface ItemService {
 
-    ItemDto createItem(Long userId, ItemDto itemDto);
+    ItemDto create(Long userId, ItemDto itemDto);
 
-    ItemDto readItem(Long userId, Long itemId);
+    ItemDto read(Long userId, Long itemId);
 
-    ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto);
+    ItemDto update(Long userId, Long itemId, ItemDto itemDto);
 
-    ItemDto deleteItem(Long userId, Long itemId);
+    ItemDto delete(Long userId, Long itemId);
 
-    List<ItemDto> findAvailableItems(String searchQuery);
+    List<ItemDto> findAvailable(String searchQuery);
 
-    List<ItemDto> readAllItems(Long userId);
+    List<ItemDto> findAll(Long userId);
 
 }

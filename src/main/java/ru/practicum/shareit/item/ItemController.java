@@ -19,39 +19,39 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody ItemDto itemDto) {
-        return itemService.createItem(userId, itemDto);
+    public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody ItemDto itemDto) {
+        return itemService.create(userId, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto readItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
-        return itemService.readItem(userId, itemId);
+    public ItemDto read(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+        return itemService.read(userId, itemId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(
+    public ItemDto update(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long itemId,
             @RequestBody ItemDto itemDto
     ) {
-        return itemService.updateItem(userId, itemId, itemDto);
+        return itemService.update(userId, itemId, itemDto);
     }
 
     @GetMapping
-    public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.readAllItems(userId);
+    public List<ItemDto> get(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemService.findAll(userId);
     }
 
     @DeleteMapping("/{itemId}")
-    public ItemDto deleteItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
-        return itemService.deleteItem(userId, itemId);
+    public ItemDto delete(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+        return itemService.delete(userId, itemId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> findRentAvailableItems(
+    public List<ItemDto> findAvailable(
             @RequestParam("text") String text
     ) {
-        return itemService.findAvailableItems(text);
+        return itemService.findAvailable(text);
     }
 
 }
