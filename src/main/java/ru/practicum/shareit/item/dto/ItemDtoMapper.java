@@ -15,7 +15,6 @@ public class ItemDtoMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getShareCounter(),
                 item.isAvailable()
         );
         log.trace(OBJECT_MAPPED_MESSAGE, item, mappedDto);
@@ -28,7 +27,6 @@ public class ItemDtoMapper {
                 userId,
                 itemDto.getName(),
                 itemDto.getDescription(),
-                itemDto.getShareCounter(),
                 itemDto.getAvailable()
         );
         log.trace(OBJECT_MAPPED_MESSAGE, itemDto, mappedItem);

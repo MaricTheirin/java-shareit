@@ -13,7 +13,6 @@ public class Item {
     private final long ownerId;
     private String name;
     private String description;
-    private short shareCounter;
     private boolean available;
 
 }
