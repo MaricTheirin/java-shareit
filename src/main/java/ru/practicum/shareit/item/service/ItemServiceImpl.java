@@ -51,8 +51,9 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Запрошено обновление объекта с id = {} ({}) для пользователя с id = {}", itemId, itemDto, userId);
         checkBeforeUpdate(userId, itemId);
 
-        Item updatedItem = getItemWithUpdatedFields(userId, itemId, itemDto);
-        Item savedItem = itemRepository.update(updatedItem);
+        Item savedItem = itemRepository.get(itemId);
+        updateItemFields(userId, savedItem, itemDto);
+        itemRepository.update(savedItem);
         log.trace("Сохранённый предмет: {}", savedItem);
         return itemDtoMapper.mapItemToDto(savedItem);
     }
@@ -110,51 +111,40 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private Item getItemWithUpdatedFields(Long ownerUserId, Long savedItemId, ItemDto updatedItemDto) {
-        log.debug("Обновление вещи с id {} данными из DTO: {}", savedItemId, updatedItemDto);
+    private void updateItemFields(Long ownerUserId, Item item, ItemDto updatedItemDto) {
+        log.debug("Обновление вещи {} данными из DTO: {}", item, updatedItemDto);
 
-        Item savedItem = itemRepository.get(savedItemId);
-        Item.ItemBuilder builder = Item.builder().id(savedItemId).ownerId(ownerUserId);
-
-        if (updatedItemDto.getName() != null) {
-            builder.name(updatedItemDto.getName());
+        if (updatedItemDto.getName() != null && !updatedItemDto.getName().isBlank()) {
+            item.setName(updatedItemDto.getName());
             log.debug(
                     "У вещи {} изменёно наименование. Старое значение - {}, новое значение - {}",
                     updatedItemDto,
-                    savedItem.getName(),
+                    item.getName(),
                     updatedItemDto.getName()
             );
-        } else {
-            builder.name(savedItem.getName());
         }
 
-        if (updatedItemDto.getDescription() != null) {
-            builder.description(updatedItemDto.getDescription());
+        if (updatedItemDto.getDescription() != null && !updatedItemDto.getDescription().isBlank()) {
+            item.setDescription(updatedItemDto.getDescription());
             log.debug(
                     "У вещи {} изменёно описание. Старое значение - {}, новое значение - {}",
-                    savedItem,
-                    savedItem.getDescription(),
+                    item,
+                    item.getDescription(),
                     updatedItemDto.getDescription()
             );
-        } else {
-            builder.description(savedItem.getDescription());
         }
 
         if (updatedItemDto.getAvailable() != null) {
-            builder.available(updatedItemDto.getAvailable());
+            item.setAvailable(updatedItemDto.getAvailable());
             log.debug(
                     "У вещи {} изменена доступность. Старое значение - {}, новое значение - {}",
-                    savedItem,
-                    savedItem.isAvailable(),
+                    item,
+                    item.isAvailable(),
                     updatedItemDto.getAvailable()
 
             );
-        } else {
-            builder.available(savedItem.isAvailable());
         }
-        Item updatedItem = builder.build();
-        log.trace("Обновлённая вещь: {}", updatedItem);
-        return updatedItem;
+        log.trace("Обновлённая вещь: {}", item);
     }
 
 }

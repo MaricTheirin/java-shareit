@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoMapper;
 import ru.practicum.shareit.user.exception.UserAlreadyExistException;
-import ru.practicum.shareit.user.exception.UserCreationException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -51,8 +50,9 @@ public class UserServiceImpl implements UserService {
         log.debug("Запрошено обновление пользователя с id = {}", userDto);
         checkBeforeUpdate(userId, userDto);
 
-        User updatedUser = getUserWithUpdatedFields(userId, userDto);
-        User savedUser = userRepository.update(updatedUser);
+        User savedUser = userRepository.get(userId);
+        updateUserFields(savedUser, userDto);
+        userRepository.update(savedUser);
         log.trace("Пользователь обновлён. Сохранённое значение: {}", savedUser);
         return userDtoMapper.mapUserToDto(savedUser);
     }
@@ -77,16 +77,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkBeforeSave(UserDto userDto) {
-        if (userDto.getEmail() == null) {
-            String errorMessage = "Невозможно сохранить пользователя с пустым email";
-            log.warn(errorMessage);
-            throw new UserCreationException(errorMessage);
-        }
-        if (userDto.getName() == null) {
-            String errorMessage = "Невозможно сохранить пользователя с пустым именем";
-            log.warn(errorMessage);
-            throw new UserCreationException(errorMessage);
-        }
         checkIfEmailExist(userDto.getEmail());
     }
 
@@ -108,42 +98,33 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private User getUserWithUpdatedFields(Long savedUserId, UserDto userUpdatedDto) {
-        log.debug("Обновление пользователя с id {} данными из DTO: {}", savedUserId, userUpdatedDto);
+    private void updateUserFields(User savedUser, UserDto userUpdatedDto) {
+        log.debug("Обновление пользователя {} данными из DTO: {}", savedUser, userUpdatedDto);
 
-        User savedUser = userRepository.get(savedUserId);
-        User.UserBuilder builder = User.builder().id(savedUserId);
+        if (userUpdatedDto.getEmail() != null && !userUpdatedDto.getEmail().isBlank()) {
+            if (!savedUser.getEmail().equals(userUpdatedDto.getEmail())) {
+                checkIfEmailExist(userUpdatedDto.getEmail());
+            }
 
-        if (!savedUser.getEmail().equals(userUpdatedDto.getEmail())) {
-            checkIfEmailExist(userUpdatedDto.getEmail());
-        }
-
-        if (userUpdatedDto.getEmail() != null) {
-            builder.email(userUpdatedDto.getEmail());
+            savedUser.setEmail(userUpdatedDto.getEmail());
             log.debug(
                     "У пользователя {} изменён email. Старое значение - {}, новое значение - {}",
                     savedUser,
                     savedUser.getEmail(),
                     userUpdatedDto.getEmail()
             );
-        } else {
-            builder.email(savedUser.getEmail());
         }
 
-        if (userUpdatedDto.getName() != null) {
-            builder.name(userUpdatedDto.getName());
+        if (userUpdatedDto.getName() != null && !userUpdatedDto.getName().isBlank()) {
+            savedUser.setName(userUpdatedDto.getName());
             log.debug(
                     "У пользователя {} измено имя. Старое значение - {}, новое значение - {}",
                     savedUser,
                     savedUser.getName(),
                     userUpdatedDto.getName()
             );
-        } else {
-            builder.name(savedUser.getName());
         }
 
-        User updatedUser = builder.build();
-        log.trace("Обновлённый пользователь: {}", updatedUser);
-        return updatedUser;
+        log.trace("Обновлённый пользователь: {}", savedUser);
     }
 }
