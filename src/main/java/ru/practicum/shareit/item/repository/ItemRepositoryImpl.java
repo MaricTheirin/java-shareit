@@ -10,31 +10,24 @@ import java.util.stream.Collectors;
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
 
-    private final Map<Long, Map<Long, Item>> items = new HashMap<>();
+    private final Map<Long, Map<Long, Item>> userItems = new HashMap<>();
+    private final Map<Long, Item> items = new HashMap<>();
     private long lastItemId = 0;
 
     @Override
     public Item save(Item item) {
         long ownerId = item.getOwnerId();
-        item.setId(++lastItemId);
-        if (!items.containsKey(ownerId)) {
-            items.put(ownerId, new HashMap<>());
-        }
 
-        items.get(ownerId).put(item.getId(), item);
+        item.setId(++lastItemId);
+        userItems.computeIfAbsent(ownerId, k -> new HashMap<>()).put(item.getId(), item);
+        items.put(item.getId(), item);
         return item;
     }
 
     @Override
     public Item get(Long itemId) {
-        Optional<Item> item = items.values().stream()
-                .map(Map::values)
-                .flatMap(Collection::stream)
-                .filter(elem -> elem.getId() == itemId)
-                .findFirst();
-
-        if (item.isPresent()) {
-            return item.get();
+        if (items.containsKey(itemId)) {
+            return items.get(itemId);
         } else {
             throw new ItemNotFoundException("Запрошенная вещь не существует");
         }
@@ -42,18 +35,20 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Item update(Item item) {
-        items.get(item.getOwnerId()).put(item.getId(), item);
+        userItems.get(item.getOwnerId()).put(item.getId(), item);
+        items.put(item.getId(), item);
         return item;
     }
 
     @Override
     public Item delete(Long userId, Long itemId) {
-        return items.get(userId).remove(itemId);
+        items.remove(itemId);
+        return userItems.get(userId).remove(itemId);
     }
 
     @Override
     public List<Item> findAll(Long userId) {
-        return new ArrayList<>(items.getOrDefault(userId, Collections.emptyMap()).values());
+        return new ArrayList<>(userItems.getOrDefault(userId, Collections.emptyMap()).values());
     }
 
     @Override
@@ -70,25 +65,17 @@ public class ItemRepositoryImpl implements ItemRepository {
                         item.getDescription().toLowerCase().contains(lowerCaseQuery)
         );
 
-        return getFlatItemsList(itemFilter);
+        return items.values().stream().filter(itemFilter).collect(Collectors.toList());
     }
 
     @Override
     public boolean isExist(Long itemId) {
-        return getFlatItemsList(item -> item.getId() == itemId).stream().findFirst().isPresent();
+        return items.containsKey(itemId);
     }
 
     @Override
     public boolean isExistAndBelongsToUser(Long userId, Long itemId) {
-        return items.getOrDefault(userId, Collections.emptyMap()).containsKey(itemId);
-    }
-
-    private List<Item> getFlatItemsList(Predicate<Item> itemFilter) {
-        return items.values().stream()
-                .map(Map::values)
-                .flatMap(Collection::stream)
-                .filter(itemFilter)
-                .collect(Collectors.toList());
+        return userItems.getOrDefault(userId, Collections.emptyMap()).containsKey(itemId);
     }
 
 }
