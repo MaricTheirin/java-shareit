@@ -30,8 +30,8 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ItemDto read(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @PathVariable Long itemId)
-    {
+            @PathVariable Long itemId
+    ) {
         return itemService.read(userId, itemId);
     }
 
