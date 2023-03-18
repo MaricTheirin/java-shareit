@@ -2,7 +2,8 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
+import ru.practicum.shareit.service.validation.Create;
+import ru.practicum.shareit.service.validation.Update;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -11,11 +12,14 @@ import javax.validation.constraints.NotNull;
 public class ItemDto {
 
     private long id;
-    @NotBlank
+
+    @NotBlank(groups = Create.class, message = "Невозможно сохранить предмет с пустым наименованием")
     private String name;
-    @NotBlank
+
+    @NotBlank(groups = {Create.class, Update.class}, message = "Невозможно сохранить предмет с пустым описанием")
     private String description;
-    @NotNull
+
+    @NotNull(groups = Create.class, message = "Невозможно сохранить предмет без указания его доступности")
     private Boolean available;
 
 }
