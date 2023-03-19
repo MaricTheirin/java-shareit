@@ -1,5 +1,6 @@
 package ru.practicum.shareit.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,6 +11,7 @@ import ru.practicum.shareit.service.exception.ShareItException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
 
+@Slf4j
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
@@ -18,6 +20,7 @@ public class DefaultExceptionHandler {
             ShareItException exception,
             HttpServletRequest request
     ) {
+        logException(exception, request);
         return new ResponseEntity<>(new ExceptionMessage(exception, request.getRequestURI()), exception.getStatus());
     }
 
@@ -26,6 +29,7 @@ public class DefaultExceptionHandler {
             MethodArgumentNotValidException exception,
             HttpServletRequest request
     ) {
+        logException(exception, request);
         String errorMessage = exception.getFieldErrors().stream()
                 .map(error -> "'" + error.getField() + "': " + error.getDefaultMessage())
                 .collect(Collectors.joining("; "));
@@ -40,6 +44,7 @@ public class DefaultExceptionHandler {
             MissingRequestHeaderException exception,
             HttpServletRequest request
     ) {
+        logException(exception, request);
         return new ResponseEntity<>(
                 new ExceptionMessage("Нарушение безопасности", request.getRequestURI()),
                 HttpStatus.BAD_REQUEST
@@ -52,9 +57,18 @@ public class DefaultExceptionHandler {
             Throwable exception,
             HttpServletRequest request
     ) {
+        logException(exception, request);
         return new ResponseEntity<>(
                 new ExceptionMessage(exception, request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR
         );
+    }
+
+    private void logException(Throwable throwable, HttpServletRequest request) {
+        log.debug(
+                "В ответ на запрос {}: {} выброшена ошибка: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                throwable.getMessage());
     }
 
 
