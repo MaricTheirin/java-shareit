@@ -52,7 +52,6 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.get(userId);
         updateUserFields(savedUser, userDto);
-        userRepository.update(savedUser);
         log.trace("Пользователь обновлён. Сохранённое значение: {}", savedUser);
         return userDtoMapper.mapUserToDto(savedUser);
     }
