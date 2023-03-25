@@ -58,7 +58,7 @@ public class ItemController {
     public List<ItemDto> findAvailable(
             @RequestParam("text") String text
     ) {
-        return itemService.findAvailable(text);
+        return itemService.findAvailableItemsBySearchQuery(text);
     }
 
 }

@@ -13,7 +13,7 @@ public interface ItemService {
 
     ItemDto delete(Long userId, Long itemId);
 
-    List<ItemDto> findAvailable(String searchQuery);
+    List<ItemDto> findAvailableItemsBySearchQuery(String searchQuery);
 
     List<ItemDto> findAll(Long userId);
 

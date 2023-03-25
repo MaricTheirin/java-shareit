@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         log.debug("Запрошен пользователь с id = {}", userId);
         checkIfUserExist(userId);
 
-        User requestedUser = userRepository.get(userId);
+        User requestedUser = userRepository.getReferenceById(userId);
         log.trace("Найден пользователь: {}", requestedUser);
         return userDtoMapper.mapUserToDto(requestedUser);
     }
@@ -50,8 +50,9 @@ public class UserServiceImpl implements UserService {
         log.debug("Запрошено обновление пользователя с id = {}", userDto);
         checkBeforeUpdate(userId, userDto);
 
-        User savedUser = userRepository.get(userId);
+        User savedUser = userRepository.getReferenceById(userId);
         updateUserFields(savedUser, userDto);
+        userRepository.flush();
         log.trace("Пользователь обновлён. Сохранённое значение: {}", savedUser);
         return userDtoMapper.mapUserToDto(savedUser);
     }
@@ -61,7 +62,8 @@ public class UserServiceImpl implements UserService {
         log.debug("Запрошено удаление пользователя с id = {}", userId);
         checkIfUserExist(userId);
 
-        User requestedUser = userRepository.delete(userId);
+        User requestedUser = userRepository.getReferenceById(userId);
+        userRepository.delete(requestedUser);
         log.trace("Удалён пользователь: {}", requestedUser);
         return userDtoMapper.mapUserToDto(requestedUser);
     }
@@ -84,14 +86,14 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkIfUserExist(Long userId) {
-        if (!userRepository.isExist(userId)) {
+        if (!userRepository.existsById(userId)) {
             log.warn("Пользователь с id = {} не существует", userId);
             throw new UserNotFoundException("Пользователь не обнаружен");
         }
     }
 
     private void checkIfEmailExist(String email) {
-        if (userRepository.isExist(email)) {
+        if (userRepository.existsByEmailIgnoreCase(email)) {
             log.warn("Пользователь с email = {} уже существует", email);
             throw new UserAlreadyExistException("Пользователь с таким email уже существует");
         }
