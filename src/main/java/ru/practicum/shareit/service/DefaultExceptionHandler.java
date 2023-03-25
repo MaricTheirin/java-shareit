@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.practicum.shareit.service.exception.ShareItException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -51,6 +54,32 @@ public class DefaultExceptionHandler {
         );
     }
 
+    @ExceptionHandler({SQLException.class})
+    protected ResponseEntity<ExceptionMessage> handleDataIntegrityViolationException(
+            SQLException exception,
+            HttpServletRequest request
+    ) {
+        logException(exception, request);
+        return new ResponseEntity<>(
+                new ExceptionMessage("Ошибка SQL: " + exception.getMessage(), request.getRequestURI()),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<ExceptionMessage> handleConstraintViolationException(
+            ConstraintViolationException exception,
+            HttpServletRequest request
+    ) {
+        logException(exception, request);
+        String errorMessage = exception.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessageTemplate)
+                .collect(Collectors.joining("; "));
+        return new ResponseEntity<>(
+                new ExceptionMessage("Ошибка при проверке: " + errorMessage, request.getRequestURI()),
+                HttpStatus.BAD_REQUEST
+        );
+    }
 
     @ExceptionHandler({Throwable.class})
     protected ResponseEntity<ExceptionMessage> handleException(
