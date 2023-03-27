@@ -14,10 +14,10 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     Item getItemByIdEqualsAndOwnerIdEquals(Long id, Long ownerId);
 
-    List<Item> findAllByOwnerId(Long ownerId);
+    List<Item> findAllByOwnerIdOrderByIdAsc(Long ownerId);
 
     @Query("SELECT new ru.practicum.shareit.item.model.Item(it.id, it.ownerId, it.name, it.description, it.available) "+
-            "FROM Item as it " +
+            "FROM Item AS it " +
             "WHERE it.available = TRUE AND (" +
                 "lower(it.name)        LIKE lower(concat('%', :searchQuery, '%')) OR " +
                 "lower(it.description) LIKE lower(concat('%', :searchQuery, '%')) " +
@@ -26,5 +26,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findAllAvailableAndContainingQueryIgnoreCase(
             @Length(min = 1, message = "Запрос не может быть пустым") String searchQuery
     );
+
+    Boolean existsItemByIdAndAvailableIsTrue(Long itemId);
 
 }
