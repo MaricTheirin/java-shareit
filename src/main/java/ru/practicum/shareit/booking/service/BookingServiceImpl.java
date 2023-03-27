@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final BookingDtoMapper bookingDtoMapper;
@@ -81,7 +81,7 @@ public class BookingServiceImpl implements BookingService{
         Booking booking = bookingRepository.getReferenceById(bookingId);
         checkBeforeReview(userId, booking);
 
-        booking.setStatus(approved ? BookingStatus.APPROVED: BookingStatus.REJECTED);
+        booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
         bookingRepository.saveAndFlush(booking);
         return bookingDtoMapper.mapBookingToResultDto(booking);
     }

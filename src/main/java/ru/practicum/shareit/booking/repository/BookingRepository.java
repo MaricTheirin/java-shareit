@@ -16,7 +16,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
 
     List<Booking> findAllByBookerIdOrderByStartDesc(Long userId);
 
-    @Query("SELECT new ru.practicum.shareit.item.model.Item(it.id, it.ownerId, it.name, it.description, it.available) "+
+    @Query("SELECT new ru.practicum.shareit.item.model.Item(it.id, it.ownerId, it.name, it.description, it.available) " +
             "FROM Item as it " +
             "WHERE it.available = TRUE AND (" +
             "lower(it.name)        LIKE lower(concat('%', :searchQuery, '%')) OR " +

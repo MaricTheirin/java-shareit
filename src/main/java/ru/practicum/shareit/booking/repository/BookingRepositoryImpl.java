@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public class BookingRepositoryImpl implements BookingRepositoryCustom{
+public class BookingRepositoryImpl implements BookingRepositoryCustom {
 
     @PersistenceContext
     private EntityManager entityManager;
