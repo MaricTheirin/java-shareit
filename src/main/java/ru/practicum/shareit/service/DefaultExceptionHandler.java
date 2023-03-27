@@ -8,6 +8,7 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.practicum.shareit.service.exception.ShareItException;
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -62,7 +63,7 @@ public class DefaultExceptionHandler {
         logException(exception, request);
         return new ResponseEntity<>(
                 new ExceptionMessage("Ошибка SQL: " + exception.getMessage(), request.getRequestURI()),
-                HttpStatus.BAD_REQUEST
+                HttpStatus.CONFLICT
         );
     }
 
@@ -77,18 +78,18 @@ public class DefaultExceptionHandler {
                 .collect(Collectors.joining("; "));
         return new ResponseEntity<>(
                 new ExceptionMessage("Ошибка при проверке: " + errorMessage, request.getRequestURI()),
-                HttpStatus.BAD_REQUEST
+                HttpStatus.CONFLICT
         );
     }
 
-    @ExceptionHandler({Throwable.class})
-    protected ResponseEntity<ExceptionMessage> handleException(
-            Throwable exception,
+    @ExceptionHandler(EntityNotFoundException.class)
+    protected ResponseEntity<ExceptionMessage> handleEntityNotFoundException(
+            EntityNotFoundException exception,
             HttpServletRequest request
     ) {
-        logException(exception, request);
         return new ResponseEntity<>(
-                new ExceptionMessage(exception, request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR
+                new ExceptionMessage("Запрошенная информация не обнаружена", request.getRequestURI()),
+                HttpStatus.NOT_FOUND
         );
     }
 
