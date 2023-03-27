@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoMapper;
-import ru.practicum.shareit.user.exception.UserAlreadyExistException;
+import ru.practicum.shareit.user.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         log.debug("Запрошено сохранение пользователя: {}", userDto);
-        checkBeforeSave(userDto);
+        //checkBeforeSave(userDto);
 
         User savedUser = userRepository.save(userDtoMapper.mapDtoToUser(userDto));
         log.trace("Сохранённый пользователь: {}", savedUser);
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
     private void checkIfEmailExist(String email) {
         if (userRepository.existsByEmailIgnoreCase(email)) {
             log.warn("Пользователь с email = {} уже существует", email);
-            throw new UserAlreadyExistException("Пользователь с таким email уже существует");
+            throw new EmailAlreadyExistException("Пользователь с таким email уже существует");
         }
     }
 
