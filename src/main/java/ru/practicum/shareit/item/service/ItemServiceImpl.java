@@ -3,13 +3,22 @@ package ru.practicum.shareit.item.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.exception.BookingNotFoundException;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoMapper;
+import ru.practicum.shareit.item.exception.ItemNotAvailableException;
 import ru.practicum.shareit.item.exception.ItemNotFoundException;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.repository.UserRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,14 +28,27 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemDtoMapper itemDtoMapper;
+    private final CommentDtoMapper commentDtoMapper;
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
 
     @Autowired
-    public ItemServiceImpl(ItemDtoMapper itemDtoMapper, ItemRepository itemRepository, UserRepository userRepository) {
+    public ItemServiceImpl(
+            ItemDtoMapper itemDtoMapper,
+            CommentDtoMapper commentDtoMapper,
+            ItemRepository itemRepository,
+            CommentRepository commentRepository,
+            UserRepository userRepository,
+            BookingRepository bookingRepository
+    ) {
         this.itemDtoMapper = itemDtoMapper;
+        this.commentDtoMapper = commentDtoMapper;
         this.itemRepository = itemRepository;
+        this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     @Override
@@ -42,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto read(Long userId, Long itemId) {
         log.debug("Пользователь с id = {} запросил объект с id = {}", userId, itemId);
-        checkIfItemExist(userId, itemId);
+        checkIfItemExist(itemId);
 
         Item resultItem = itemRepository.getReferenceById(itemId);
         log.trace("Найден объект {}", resultItem);
@@ -66,7 +88,7 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Для пользователя с id = {} удаляется предмет с id = {}", userId, itemId);
 
         checkIfUserExist(userId);
-        checkIfItemExist(userId, itemId);
+        checkIfItemExistAndBelongsToUser(userId, itemId);
         Item itemToDelete = itemRepository.getReferenceById(itemId);
         itemRepository.delete(itemToDelete);
         log.trace("Выполнено удаление предмета: {}", itemToDelete);
@@ -95,13 +117,38 @@ public class ItemServiceImpl implements ItemService {
         return allUserItems.stream().map(item -> itemDtoMapper.mapItemToDto(item, true)).collect(Collectors.toList());
     }
 
+    @Override
+    public CommentDto createComment(Long userId, Long itemId, CommentDto commentDto) {
+        log.debug(
+                "Пользователь с id = {} запросил добавление к предмету с id = {} комментария {}",
+                userId, itemId, commentDto
+        );
+        commentDto.setItemId(itemId);
+        commentDto.setCreated(LocalDateTime.now());
+        checkBeforeCommentSave(userId, itemId, commentDto);
+
+        Comment savedComment = commentRepository.saveAndFlush(commentDtoMapper.mapDtoToComment(commentDto, userId));
+        log.trace("Результат сохранения комментария: {}", savedComment);
+        return commentDtoMapper.mapCommentToDto(savedComment);
+    }
+
+    private void checkBeforeCommentSave(Long userId, Long itemId, CommentDto commentDto) {
+        checkIfUserExist(userId);
+        checkIfItemExist(itemId);
+        if (!bookingRepository.existsBookingByItemIdAndBookerIdAndStatusAndEndIsBefore(
+                itemId, userId, BookingStatus.APPROVED, LocalDateTime.now())
+        ) {
+            throw new ItemNotAvailableException("Оставить комментарий можно только успешной аренды");
+        }
+    }
+
     private void checkBeforeSave(Long userId, ItemDto itemDto) {
         checkIfUserExist(userId);
     }
 
     private void checkBeforeUpdate(Long userId, Long itemId) {
         checkIfUserExist(userId);
-        checkIfItemExist(userId, itemId);
+        checkIfItemExistAndBelongsToUser(userId, itemId);
     }
 
     private void checkIfUserExist(Long userId) {
@@ -111,15 +158,20 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private void checkIfItemExist(Long userId, Long itemId) {
+    private void checkIfItemExist(Long itemId) {
         if (!itemRepository.existsById(itemId)) {
             log.warn("Предмет с id = {} не существует", itemId);
             throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не был добавлен ранее");
         }
-//        if (item.getOwnerId() != userId) {
-//            log.warn("Предмет с id = {} не принадлежит пользователю с id = {}", itemId, userId);
-//            throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не принадлежит пользователю");
-//        }
+    }
+
+    private void checkIfItemExistAndBelongsToUser(Long userId, Long itemId) {
+        checkIfItemExist(itemId);
+        Item item = itemRepository.getReferenceById(itemId);
+        if (item.getOwnerId() != userId) {
+            log.warn("Предмет с id = {} не принадлежит пользователю с id = {}", itemId, userId);
+            throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не принадлежит пользователю");
+        }
     }
 
     private void updateItemFields(Long ownerUserId, Item item, ItemDto updatedItemDto) {

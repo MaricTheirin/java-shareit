@@ -7,6 +7,7 @@ import ru.practicum.shareit.service.validation.Create;
 import ru.practicum.shareit.service.validation.Update;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -26,5 +27,7 @@ public class ItemDto {
     private BookingDto lastBooking;
 
     private BookingDto nextBooking;
+
+    private List<CommentDto> comments;
 
 }
