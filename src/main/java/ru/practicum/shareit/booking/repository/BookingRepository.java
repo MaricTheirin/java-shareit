@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -30,7 +32,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
             "WHERE b.itemId = :itemId and b.end = (" +
                 "SELECT MAX(b.end) " +
                 "FROM Booking AS b " +
-                "WHERE b.end < CURRENT_TIMESTAMP " +
+                "WHERE b.start < CURRENT_TIMESTAMP " +
                 "AND b.itemId = :itemId " +
             ")")
     BookingDto getLastBooking(Long itemId);
@@ -45,5 +47,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
                 "AND b.status <> ru.practicum.shareit.booking.model.BookingStatus.REJECTED " +
             ")")
     BookingDto getNextBooking(Long itemId);
+
+    Boolean existsBookingByItemIdAndBookerIdAndStatusAndEndIsBefore(
+            Long itemId,
+            Long bookerId,
+            BookingStatus status,
+            LocalDateTime bookedBefore
+    );
 
 }
