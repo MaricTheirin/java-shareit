@@ -42,9 +42,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto read(Long userId, Long itemId) {
         log.debug("Пользователь с id = {} запросил объект с id = {}", userId, itemId);
+        checkIfItemExist(userId, itemId);
+
         Item resultItem = itemRepository.getReferenceById(itemId);
         log.trace("Найден объект {}", resultItem);
-        return itemDtoMapper.mapItemToDto(resultItem);
+        return itemDtoMapper.mapItemToDto(resultItem, userId.equals(resultItem.getOwnerId()));
     }
 
     @Override
@@ -88,9 +90,9 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Для пользователя с id = {} запрошен список всех предметов", userId);
         checkIfUserExist(userId);
 
-        List<Item> allUserItems = itemRepository.findAllByOwnerId(userId);
+        List<Item> allUserItems = itemRepository.findAllByOwnerIdOrderByIdAsc(userId);
         log.trace("Получен массив предметов: {}", allUserItems);
-        return allUserItems.stream().map(itemDtoMapper::mapItemToDto).collect(Collectors.toList());
+        return allUserItems.stream().map(item -> itemDtoMapper.mapItemToDto(item, true)).collect(Collectors.toList());
     }
 
     private void checkBeforeSave(Long userId, ItemDto itemDto) {
@@ -110,47 +112,40 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void checkIfItemExist(Long userId, Long itemId) {
-        Item item;
-
-        if (itemRepository.existsById(itemId)) {
-            item = itemRepository.getReferenceById(itemId);
-        } else {
+        if (!itemRepository.existsById(itemId)) {
             log.warn("Предмет с id = {} не существует", itemId);
             throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не был добавлен ранее");
         }
-
-        if (item.getOwnerId() != userId) {
-            log.warn("Предмет с id = {} не принадлежит пользователю с id = {}", itemId, userId);
-            throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не принадлежит пользователю");
-        }
-
+//        if (item.getOwnerId() != userId) {
+//            log.warn("Предмет с id = {} не принадлежит пользователю с id = {}", itemId, userId);
+//            throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не принадлежит пользователю");
+//        }
     }
 
     private void updateItemFields(Long ownerUserId, Item item, ItemDto updatedItemDto) {
         log.debug("Обновление вещи {} данными из DTO: {}", item, updatedItemDto);
 
         if (updatedItemDto.getName() != null && !updatedItemDto.getName().isBlank()) {
-            item.setName(updatedItemDto.getName());
             log.debug(
                     "У вещи {} изменёно наименование. Старое значение - {}, новое значение - {}",
                     updatedItemDto,
                     item.getName(),
                     updatedItemDto.getName()
             );
+            item.setName(updatedItemDto.getName());
         }
 
         if (updatedItemDto.getDescription() != null && !updatedItemDto.getDescription().isBlank()) {
-            item.setDescription(updatedItemDto.getDescription());
             log.debug(
                     "У вещи {} изменёно описание. Старое значение - {}, новое значение - {}",
                     item,
                     item.getDescription(),
                     updatedItemDto.getDescription()
             );
+            item.setDescription(updatedItemDto.getDescription());
         }
 
         if (updatedItemDto.getAvailable() != null) {
-            item.setAvailable(updatedItemDto.getAvailable());
             log.debug(
                     "У вещи {} изменена доступность. Старое значение - {}, новое значение - {}",
                     item,
@@ -158,6 +153,7 @@ public class ItemServiceImpl implements ItemService {
                     updatedItemDto.getAvailable()
 
             );
+            item.setAvailable(updatedItemDto.getAvailable());
         }
         log.trace("Обновлённая вещь: {}", item);
     }
