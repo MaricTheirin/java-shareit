@@ -1,6 +1,7 @@
 package ru.practicum.shareit.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -55,8 +56,20 @@ public class DefaultExceptionHandler {
         );
     }
 
-    @ExceptionHandler({SQLException.class})
+    @ExceptionHandler({DataIntegrityViolationException.class})
     protected ResponseEntity<ExceptionMessage> handleDataIntegrityViolationException(
+            DataIntegrityViolationException exception,
+            HttpServletRequest request
+    ) {
+        logException(exception, request);
+        return new ResponseEntity<>(
+                new ExceptionMessage("Нарушение корректности данных", request.getRequestURI()),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler({SQLException.class})
+    protected ResponseEntity<ExceptionMessage> handleSQLException(
             SQLException exception,
             HttpServletRequest request
     ) {

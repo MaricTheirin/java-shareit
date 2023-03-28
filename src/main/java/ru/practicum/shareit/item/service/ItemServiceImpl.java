@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -54,6 +55,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemResponseDto create(Long userId, ItemDto itemDto) {
         log.debug("Для пользователя с id = {} добавляется новый объект: {}", userId, itemDto);
         checkBeforeSave(userId, itemDto);
@@ -65,6 +67,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemResponseDto read(Long userId, Long itemId) {
         log.debug("Пользователь с id = {} запросил объект с id = {}", userId, itemId);
         checkIfItemExist(itemId);
@@ -76,6 +79,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemResponseDto update(Long userId, Long itemId, ItemDto itemDto) {
         log.debug("Запрошено обновление объекта с id = {} ({}) для пользователя с id = {}", itemId, itemDto, userId);
         checkBeforeUpdate(userId, itemId);
@@ -88,6 +92,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemResponseDto delete(Long userId, Long itemId) {
         log.debug("Для пользователя с id = {} удаляется предмет с id = {}", userId, itemId);
 
@@ -100,6 +105,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemResponseDto> findAvailableItemsBySearchQuery(String searchQuery) {
         log.debug("Запрошен поиск всех доступных вещей, содержащих '{}'", searchQuery);
         if (searchQuery.length() == 0) {
@@ -113,6 +119,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemResponseDto> findAll(Long userId) {
         log.debug("Для пользователя с id = {} запрошен список всех предметов", userId);
         checkIfUserExist(userId);
@@ -123,6 +130,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentResponseDto createComment(Long userId, Long itemId, CommentDto commentDto) {
         log.debug(
                 "Пользователь с id = {} запросил добавление к предмету с id = {} комментария {}",

@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.*;
 import ru.practicum.shareit.booking.exception.*;
 import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
@@ -41,6 +42,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingResponseDto create(Long userId, BookingDto bookingDto) {
         log.debug("Пользователь с id = {} пытается взять в аренду: {}", userId, bookingDto);
         checkBeforeSave(userId, bookingDto);
@@ -55,6 +57,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingResponseDto read(Long userId, Long bookingId) {
         log.debug("Пользователь с id = {} запросил информацию об аренде с id = {}", userId, bookingId);
 
@@ -66,6 +69,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingResponseDto review(Long userId, Long bookingId, Boolean approved) {
         log.debug(
                 "Добавление ответа на бронирование от пользователя с id = {} для предмета с id = {}. Результат = {}",
@@ -86,6 +90,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingResponseDto> findOwnBookings(Long userId, String state) {
         log.debug("Пользователь с id = {} запросил информацию о всех своих арендах в состоянии {}", userId, state);
         checkIfUserExists(userId);
@@ -97,6 +102,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingResponseDto> findOwnItemsBookings(Long userId, String state) {
         log.debug("Пользователь с id = {} запросил информацию об арендах своих вещей в состоянии {}", userId, state);
         BookingState bookingState = findStateForUserString(state);
