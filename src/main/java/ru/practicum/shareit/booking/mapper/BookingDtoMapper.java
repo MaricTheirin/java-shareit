@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingResultDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.mapper.ItemDtoMapper;
@@ -26,8 +26,8 @@ public class BookingDtoMapper {
         this.itemDtoMapper = itemDtoMapper;
     }
 
-    public BookingResultDto mapBookingToResultDto(Booking booking) {
-        BookingResultDto resultDto = new BookingResultDto(
+    public BookingResponseDto mapBookingToResultDto(Booking booking) {
+        BookingResponseDto resultDto = new BookingResponseDto(
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),

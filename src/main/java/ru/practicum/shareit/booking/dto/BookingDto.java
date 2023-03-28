@@ -2,14 +2,12 @@ package ru.practicum.shareit.booking.dto;
 
 import lombok.Data;
 import ru.practicum.shareit.service.validation.Create;
-import ru.practicum.shareit.service.validation.Update;
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Data
 public class BookingDto {
 
-    @NotBlank(groups = Update.class)
     private final long id;
 
     @NotNull(groups = Create.class, message = "Необходимо указать ID предмета")

@@ -41,7 +41,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResultDto create(Long userId, BookingDto bookingDto) {
+    public BookingResponseDto create(Long userId, BookingDto bookingDto) {
         log.debug("Пользователь с id = {} пытается взять в аренду: {}", userId, bookingDto);
         checkBeforeSave(userId, bookingDto);
         Item item = itemRepository.getReferenceById(bookingDto.getItemId());
@@ -55,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResultDto read(Long userId, Long bookingId) {
+    public BookingResponseDto read(Long userId, Long bookingId) {
         log.debug("Пользователь с id = {} запросил информацию об аренде с id = {}", userId, bookingId);
 
         checkIfBookingExists(bookingId);
@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResultDto review(Long userId, Long bookingId, Boolean approved) {
+    public BookingResponseDto review(Long userId, Long bookingId, Boolean approved) {
         log.debug(
                 "Добавление ответа на бронирование от пользователя с id = {} для предмета с id = {}. Результат = {}",
                 userId,
@@ -86,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResultDto> findOwnBookings(Long userId, String state) {
+    public List<BookingResponseDto> findOwnBookings(Long userId, String state) {
         log.debug("Пользователь с id = {} запросил информацию о всех своих арендах в состоянии {}", userId, state);
         checkIfUserExists(userId);
         BookingState bookingState = findStateForUserString(state);
@@ -97,7 +97,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResultDto> findOwnItemsBookings(Long userId, String state) {
+    public List<BookingResponseDto> findOwnItemsBookings(Long userId, String state) {
         log.debug("Пользователь с id = {} запросил информацию об арендах своих вещей в состоянии {}", userId, state);
         BookingState bookingState = findStateForUserString(state);
 

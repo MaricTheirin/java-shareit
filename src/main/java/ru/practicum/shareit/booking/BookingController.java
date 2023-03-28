@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingResultDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.service.validation.Create;
 import java.util.List;
@@ -21,7 +21,7 @@ public class BookingController {
     }
 
     @PostMapping
-    protected BookingResultDto book(
+    protected BookingResponseDto book(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @Validated({Create.class}) @RequestBody BookingDto bookingDto
     ) {
@@ -29,7 +29,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    protected BookingResultDto review(
+    protected BookingResponseDto review(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable long bookingId,
             @RequestParam Boolean approved
@@ -38,7 +38,7 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    protected BookingResultDto get(
+    protected BookingResponseDto get(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long bookingId
     ) {
@@ -46,7 +46,7 @@ public class BookingController {
     }
 
     @GetMapping()
-    protected List<BookingResultDto> getOwnBookings(
+    protected List<BookingResponseDto> getOwnBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "ALL") String state
     ) {
@@ -54,7 +54,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    protected List<BookingResultDto> findOwnItemsBookings(
+    protected List<BookingResponseDto> findOwnItemsBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "ALL") String state
     ) {
