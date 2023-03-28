@@ -6,8 +6,6 @@ import org.hibernate.validator.constraints.Length;
 import ru.practicum.shareit.service.validation.Create;
 import ru.practicum.shareit.service.validation.Update;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -18,14 +16,5 @@ public class CommentDto {
 
     @Length(min = 2, groups = {Create.class, Update.class}, message = "Длина комментария должна превышать 2 символа")
     private String text;
-
-    @Null(groups = {Create.class, Update.class})
-    private Long itemId;
-
-    @Null(groups = {Create.class, Update.class})
-    private String authorName;
-
-    @Null(groups = {Create.class, Update.class})
-    private LocalDateTime created;
 
 }
