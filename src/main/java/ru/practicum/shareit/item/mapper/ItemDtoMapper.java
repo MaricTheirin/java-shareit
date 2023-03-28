@@ -5,10 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.user.model.User;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,10 +53,10 @@ public class ItemDtoMapper {
     }
 
     public ItemResponseDto mapItemToResponseDto(Item item, BookingDto lastBooking, BookingDto nextBooking) {
-        List<CommentDto> itemComments = commentRepository
+        List<CommentResponseDto> itemComments = commentRepository
                 .findAllByItemId(item.getId())
                 .stream()
-                .map(commentDtoMapper::mapCommentToDto)
+                .map(commentDtoMapper::mapCommentToResponseDto)
                 .collect(Collectors.toList());
 
         ItemResponseDto mappedItemResponseDto = new ItemResponseDto(
@@ -70,10 +73,10 @@ public class ItemDtoMapper {
         return mappedItemResponseDto;
     }
 
-    public Item mapDtoToItem(Long userId, ItemDto itemDto) {
+    public Item mapDtoToItem(ItemDto itemDto, User owner) {
         Item mappedItem = new Item(
                 itemDto.getId(),
-                userId,
+                owner,
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getAvailable()

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 
@@ -13,12 +15,12 @@ import java.time.LocalDateTime;
 @Component
 public class CommentDtoMapper {
 
-    public Comment mapDtoToComment(CommentDto commentDto, Long authorId, Long itemId) {
+    public Comment mapDtoToComment(CommentDto commentDto, User author, Item item) {
         return new Comment(
                 commentDto.getId(),
                 commentDto.getText(),
-                itemId,
-                authorId,
+                item,
+                author,
                 LocalDateTime.now()
         );
     }
@@ -31,7 +33,13 @@ public class CommentDtoMapper {
     }
 
     public CommentResponseDto mapCommentToResponseDto(Comment comment) {
-        return null;
+        return new CommentResponseDto(
+                comment.getId(),
+                comment.getText(),
+                comment.getItem().getId(),
+                comment.getAuthor().getName(),
+                comment.getCreated()
+        );
     }
 
 

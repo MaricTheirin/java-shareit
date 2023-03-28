@@ -6,8 +6,10 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.mapper.ItemDtoMapper;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.dto.UserDtoMapper;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 @Slf4j
@@ -39,8 +41,8 @@ public class BookingDtoMapper {
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getStatus(),
-                userDtoMapper.mapUserToDto(userRepository.getReferenceById(booking.getBookerId())),
-                itemDtoMapper.mapItemToDto(itemRepository.getReferenceById(booking.getItemId()))
+                userDtoMapper.mapUserToDto(userRepository.getReferenceById(booking.getBooker().getId())),
+                itemDtoMapper.mapItemToDto(itemRepository.getReferenceById(booking.getItem().getId()))
         );
         log.trace(OBJECT_MAPPED_MESSAGE, booking, resultDto);
         return resultDto;
@@ -49,20 +51,20 @@ public class BookingDtoMapper {
     public BookingDto mapBookingToBookingDto(Booking booking) {
         BookingDto resultDto = new BookingDto(
                 booking.getId(),
-                booking.getItemId(),
+                booking.getItem().getId(),
                 booking.getStart(),
                 booking.getEnd(),
-                booking.getBookerId()
+                booking.getBooker().getId()
         );
         log.trace(OBJECT_MAPPED_MESSAGE, booking, resultDto);
         return resultDto;
     }
 
-    public Booking mapDtoToBooking(Long userId, BookingDto bookingDto) {
+    public Booking mapDtoToBooking(BookingDto bookingDto, Item item, User booker) {
         Booking mappedBooking = new Booking(
                 bookingDto.getId(),
-                bookingDto.getItemId(),
-                userId,
+                item,
+                booker,
                 bookingDto.getStart(),
                 bookingDto.getEnd(),
                 BookingStatus.WAITING
