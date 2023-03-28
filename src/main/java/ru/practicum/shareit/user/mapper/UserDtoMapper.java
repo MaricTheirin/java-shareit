@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.mapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserResponseDto;
 import ru.practicum.shareit.user.model.User;
 
 @Slf4j
@@ -17,10 +18,10 @@ public class UserDtoMapper {
         return user;
     }
 
-    public UserDto mapUserToDto(User user) {
-        UserDto userDto = new UserDto(user.getId(), user.getName(), user.getEmail());
-        log.trace(DEFAULT_MESSAGE, user, userDto);
-        return userDto;
+    public UserResponseDto mapUserToResponseDto(User user) {
+        UserResponseDto userResultDto = new UserResponseDto(user.getId(), user.getName(), user.getEmail());
+        log.trace(DEFAULT_MESSAGE, user, userResultDto);
+        return userResultDto;
     }
 
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserResponseDto;
 import ru.practicum.shareit.user.mapper.UserDtoMapper;
 import ru.practicum.shareit.user.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
@@ -26,26 +27,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto create(UserDto userDto) {
+    public UserResponseDto create(UserDto userDto) {
         log.debug("Запрошено сохранение пользователя: {}", userDto);
 
         User savedUser = userRepository.save(userDtoMapper.mapDtoToUser(userDto));
         log.trace("Сохранённый пользователь: {}", savedUser);
-        return userDtoMapper.mapUserToDto(savedUser);
+        return userDtoMapper.mapUserToResponseDto(savedUser);
     }
 
     @Override
-    public UserDto read(Long userId) {
+    public UserResponseDto read(Long userId) {
         log.debug("Запрошен пользователь с id = {}", userId);
         checkIfUserExist(userId);
 
         User requestedUser = userRepository.getReferenceById(userId);
         log.trace("Найден пользователь: {}", requestedUser);
-        return userDtoMapper.mapUserToDto(requestedUser);
+        return userDtoMapper.mapUserToResponseDto(requestedUser);
     }
 
     @Override
-    public UserDto update(Long userId, UserDto userDto) {
+    public UserResponseDto update(Long userId, UserDto userDto) {
         log.debug("Запрошено обновление пользователя с id = {}", userDto);
         checkBeforeUpdate(userId, userDto);
 
@@ -53,25 +54,25 @@ public class UserServiceImpl implements UserService {
         updateUserFields(savedUser, userDto);
         userRepository.flush();
         log.trace("Пользователь обновлён. Сохранённое значение: {}", savedUser);
-        return userDtoMapper.mapUserToDto(savedUser);
+        return userDtoMapper.mapUserToResponseDto(savedUser);
     }
 
     @Override
-    public UserDto delete(Long userId) {
+    public UserResponseDto delete(Long userId) {
         log.debug("Запрошено удаление пользователя с id = {}", userId);
         checkIfUserExist(userId);
 
         User requestedUser = userRepository.getReferenceById(userId);
         userRepository.delete(requestedUser);
         log.trace("Удалён пользователь: {}", requestedUser);
-        return userDtoMapper.mapUserToDto(requestedUser);
+        return userDtoMapper.mapUserToResponseDto(requestedUser);
     }
 
     @Override
-    public List<UserDto> findAll() {
+    public List<UserResponseDto> findAll() {
         log.debug("Запрошен список всех пользователей");
-        List<UserDto> users =
-                userRepository.findAll().stream().map(userDtoMapper::mapUserToDto).collect(Collectors.toList());
+        List<UserResponseDto> users =
+                userRepository.findAll().stream().map(userDtoMapper::mapUserToResponseDto).collect(Collectors.toList());
         log.trace("Полученное значение: {}", users);
         return users;
     }
