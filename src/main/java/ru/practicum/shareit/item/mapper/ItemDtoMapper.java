@@ -20,17 +20,6 @@ import java.util.stream.Collectors;
 public class ItemDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
-    private final CommentRepository commentRepository;
-    private final CommentDtoMapper commentDtoMapper;
-
-    @Autowired
-    public ItemDtoMapper(
-            CommentRepository commentRepository,
-            CommentDtoMapper commentDtoMapper
-    ) {
-        this.commentRepository = commentRepository;
-        this.commentDtoMapper = commentDtoMapper;
-    }
 
     public ItemDto mapItemToDto(Item item) {
         return mapItemToDto(item, false);
@@ -49,16 +38,19 @@ public class ItemDtoMapper {
     }
 
     public ItemResponseDto mapItemToResponseDto(Item item) {
-        return mapItemToResponseDto(item, null, null);
+        return mapItemToResponseDto(item, null);
     }
 
-    public ItemResponseDto mapItemToResponseDto(Item item, BookingDto lastBooking, BookingDto nextBooking) {
-        List<CommentResponseDto> itemComments = commentRepository
-                .findAllByItemId(item.getId())
-                .stream()
-                .map(commentDtoMapper::mapCommentToResponseDto)
-                .collect(Collectors.toList());
+    public ItemResponseDto mapItemToResponseDto(Item item, List<CommentResponseDto> comments) {
+        return mapItemToResponseDto(item, null, null, comments);
+    }
 
+    public ItemResponseDto mapItemToResponseDto(
+            Item item,
+            BookingDto lastBooking,
+            BookingDto nextBooking,
+            List<CommentResponseDto> itemComments
+    ) {
         ItemResponseDto mappedItemResponseDto = new ItemResponseDto(
                 item.getId(),
                 item.getName(),

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.*;
 import ru.practicum.shareit.booking.exception.*;
+import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
 import ru.practicum.shareit.booking.model.*;
 import ru.practicum.shareit.item.exception.*;
 import ru.practicum.shareit.booking.repository.BookingRepository;

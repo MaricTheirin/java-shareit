@@ -109,7 +109,7 @@ public class ItemServiceImpl implements ItemService {
         List<Item> foundItems = itemRepository.findAllAvailableAndContainingQueryIgnoreCase(searchQuery);
         log.trace("Найденные вещи: {}", foundItems);
 
-        return foundItems.stream().map(itemDtoMapper::mapItemToResponseDto).collect(Collectors.toList());
+        return foundItems.stream().map(item -> mapItemToResponseDto(item, 0)).collect(Collectors.toList());
     }
 
     @Override
@@ -218,14 +218,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private ItemResponseDto mapItemToResponseDto(Item item, long requestedUserId) {
-        if (item.getOwner().getId() == requestedUserId) {
-            return itemDtoMapper.mapItemToResponseDto(
-                    item,
-                    bookingRepository.getLastBooking(item.getId()),
-                    bookingRepository.getNextBooking(item.getId())
-            );
+        List<CommentResponseDto> itemComments = commentRepository
+                .findAllByItemId(item.getId())
+                .stream()
+                .map(commentDtoMapper::mapCommentToResponseDto)
+                .collect(Collectors.toList());
+
+        if (requestedUserId != item.getOwner().getId()) {
+            return itemDtoMapper.mapItemToResponseDto(item, itemComments);
         }
-        return itemDtoMapper.mapItemToResponseDto(item);
+
+        return itemDtoMapper.mapItemToResponseDto(
+                item,
+                bookingRepository.getLastBooking(item.getId()),
+                bookingRepository.getNextBooking(item.getId()),
+                itemComments
+        );
     }
 
 }

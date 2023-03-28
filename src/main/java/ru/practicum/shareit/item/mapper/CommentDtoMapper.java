@@ -25,13 +25,6 @@ public class CommentDtoMapper {
         );
     }
 
-    public CommentDto mapCommentToDto(Comment comment) {
-        return new CommentDto(
-                comment.getId(),
-                comment.getText()
-        );
-    }
-
     public CommentResponseDto mapCommentToResponseDto(Comment comment) {
         return new CommentResponseDto(
                 comment.getId(),
