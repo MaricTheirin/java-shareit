@@ -3,7 +3,7 @@ package ru.practicum.shareit.booking.repository;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long>, BookingRepositoryCustom {
-
-    List<Booking> findAllByBookerIdOrderByStartDesc(Long userId);
 
     @Query("SELECT new ru.practicum.shareit.item.model.Item(it.id, u, it.name, it.description, it.available) " +
             "FROM Item AS it " +
@@ -26,7 +24,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
             @Length(min = 1, message = "Запрос не может быть пустым") String searchQuery
     );
 
-    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingDto(b.id, i.id, b.start, b.end, u.id) " +
+    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingShortResponseDto(b.id, b.booker.id, b.start, b.end) " +
             "FROM Booking AS b " +
             "JOIN Item AS i ON b.item = i " +
             "JOIN User AS u ON b.booker = u " +
@@ -36,9 +34,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
                 "WHERE b.start < CURRENT_TIMESTAMP " +
                 "AND b.item.id = :itemId " +
             ")")
-    BookingDto getLastBooking(Long itemId);
+    BookingShortResponseDto getLastBooking(Long itemId);
 
-    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingDto(b.id, b.item.id, b.start, b.end, b.booker.id) " +
+    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingShortResponseDto(b.id, b.booker.id, b.start, b.end) " +
             "FROM Booking AS b " +
             "WHERE b.item.id = :itemId and b.start = (" +
                 "SELECT MIN(b.start) " +
@@ -47,7 +45,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
                 "AND b.item.id = :itemId " +
                 "AND b.status <> ru.practicum.shareit.booking.model.BookingStatus.REJECTED " +
             ")")
-    BookingDto getNextBooking(Long itemId);
+    BookingShortResponseDto getNextBooking(Long itemId);
 
     Boolean existsBookingByItemIdAndBookerIdAndStatusAndEndIsBefore(
             Long itemId,
