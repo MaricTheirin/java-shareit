@@ -14,8 +14,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
 
     List<Booking> findAllByBookerIdOrderByStartDesc(Long userId);
 
-    @Query("SELECT new ru.practicum.shareit.item.model.Item(it.id, it.ownerId, it.name, it.description, it.available) " +
-            "FROM Item as it " +
+    @Query("SELECT new ru.practicum.shareit.item.model.Item(it.id, u, it.name, it.description, it.available) " +
+            "FROM Item AS it " +
+            "JOIN User AS u ON it.owner = u " +
             "WHERE it.available = TRUE AND (" +
             "lower(it.name)        LIKE lower(concat('%', :searchQuery, '%')) OR " +
             "lower(it.description) LIKE lower(concat('%', :searchQuery, '%')) " +
@@ -25,23 +26,25 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
             @Length(min = 1, message = "Запрос не может быть пустым") String searchQuery
     );
 
-    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingDto(b.id, b.itemId, b.start, b.end, b.bookerId) " +
+    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingDto(b.id, i.id, b.start, b.end, u.id) " +
             "FROM Booking AS b " +
-            "WHERE b.itemId = :itemId and b.end = (" +
+            "JOIN Item AS i ON b.item = i " +
+            "JOIN User AS u ON b.booker = u " +
+            "WHERE i.id = :itemId and b.end = (" +
                 "SELECT MAX(b.end) " +
                 "FROM Booking AS b " +
                 "WHERE b.start < CURRENT_TIMESTAMP " +
-                "AND b.itemId = :itemId " +
+                "AND b.item.id = :itemId " +
             ")")
     BookingDto getLastBooking(Long itemId);
 
-    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingDto(b.id, b.itemId, b.start, b.end, b.bookerId) " +
+    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingDto(b.id, b.item.id, b.start, b.end, b.booker.id) " +
             "FROM Booking AS b " +
-            "WHERE b.itemId = :itemId and b.start = (" +
+            "WHERE b.item.id = :itemId and b.start = (" +
                 "SELECT MIN(b.start) " +
                 "FROM Booking AS b " +
                 "WHERE b.start > CURRENT_TIMESTAMP " +
-                "AND b.itemId = :itemId " +
+                "AND b.item.id = :itemId " +
                 "AND b.status <> ru.practicum.shareit.booking.model.BookingStatus.REJECTED " +
             ")")
     BookingDto getNextBooking(Long itemId);
