@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
+import ru.practicum.shareit.user.model.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -22,13 +24,16 @@ public class Comment {
     @Length(max = 256)
     private String text;
 
-    @Column(name = "item_id")
-    private Long itemId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "item_id", nullable = false)
+    private Item item;
 
-    @Column(name = "author_id")
-    private Long authorId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
     @Column
+    @CreationTimestamp
     private LocalDateTime created;
 
 }
