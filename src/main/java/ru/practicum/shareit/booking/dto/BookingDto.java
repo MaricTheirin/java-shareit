@@ -21,6 +21,4 @@ public class BookingDto {
     @Future(groups = Create.class, message = "Окончание бронирования не может быть в прошлом")
     private final LocalDateTime end;
 
-    private final Long bookerId;
-
 }
