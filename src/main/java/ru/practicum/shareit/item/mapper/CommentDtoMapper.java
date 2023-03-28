@@ -13,24 +13,30 @@ import java.time.LocalDateTime;
 @Component
 public class CommentDtoMapper {
 
+    private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
+
     public Comment mapDtoToComment(CommentDto commentDto, User author, Item item) {
-        return new Comment(
+        Comment mappedComment = new Comment(
                 commentDto.getId(),
                 commentDto.getText(),
                 item,
                 author,
                 LocalDateTime.now()
         );
+        log.trace(OBJECT_MAPPED_MESSAGE, item, mappedComment);
+        return mappedComment;
     }
 
     public CommentResponseDto mapCommentToResponseDto(Comment comment) {
-        return new CommentResponseDto(
+        CommentResponseDto mappedResponseDto = new CommentResponseDto(
                 comment.getId(),
                 comment.getText(),
                 comment.getItem().getId(),
                 comment.getAuthor().getName(),
                 comment.getCreated()
         );
+        log.trace(OBJECT_MAPPED_MESSAGE, comment, mappedResponseDto);
+        return mappedResponseDto;
     }
 
 
