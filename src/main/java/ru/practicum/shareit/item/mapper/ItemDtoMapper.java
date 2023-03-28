@@ -1,9 +1,12 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.item.mapper;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import java.util.List;
@@ -14,17 +17,14 @@ import java.util.stream.Collectors;
 public class ItemDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
-    private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final CommentDtoMapper commentDtoMapper;
 
     @Autowired
     public ItemDtoMapper(
-            BookingRepository bookingRepository,
             CommentRepository commentRepository,
             CommentDtoMapper commentDtoMapper
     ) {
-        this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
         this.commentDtoMapper = commentDtoMapper;
     }
@@ -34,29 +34,40 @@ public class ItemDtoMapper {
     }
 
     public ItemDto mapItemToDto(Item item, boolean belongsToRequestedUser) {
+        ItemDto mappedDto = new ItemDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.isAvailable()
+        );
+
+        log.trace(OBJECT_MAPPED_MESSAGE, item, mappedDto);
+        return mappedDto;
+    }
+
+    public ItemResponseDto mapItemToResponseDto(Item item) {
+        return mapItemToResponseDto(item, null, null);
+    }
+
+    public ItemResponseDto mapItemToResponseDto(Item item, BookingDto lastBooking, BookingDto nextBooking) {
         List<CommentDto> itemComments = commentRepository
                 .findAllByItemId(item.getId())
                 .stream()
                 .map(commentDtoMapper::mapCommentToDto)
                 .collect(Collectors.toList());
 
-        ItemDto mappedDto = new ItemDto(
+        ItemResponseDto mappedItemResponseDto = new ItemResponseDto(
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.isAvailable(),
-                null,
-                null,
+                lastBooking,
+                nextBooking,
                 itemComments
         );
 
-        if (belongsToRequestedUser) {
-            mappedDto.setLastBooking(bookingRepository.getLastBooking(item.getId()));
-            mappedDto.setNextBooking(bookingRepository.getNextBooking(item.getId()));
-        }
-
-        log.trace(OBJECT_MAPPED_MESSAGE, item, mappedDto);
-        return mappedDto;
+        log.trace(OBJECT_MAPPED_MESSAGE, item, mappedItemResponseDto);
+        return mappedItemResponseDto;
     }
 
     public Item mapDtoToItem(Long userId, ItemDto itemDto) {

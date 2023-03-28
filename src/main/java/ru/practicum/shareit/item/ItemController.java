@@ -5,6 +5,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.service.validation.Create;
 import ru.practicum.shareit.item.service.ItemService;
 import java.util.List;
@@ -21,7 +22,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto create(
+    public ItemResponseDto create(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @Validated(Create.class) @RequestBody ItemDto itemDto
     ) {
@@ -29,7 +30,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto read(
+    public ItemResponseDto read(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long itemId
     ) {
@@ -37,7 +38,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(
+    public ItemResponseDto update(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long itemId,
             @RequestBody ItemDto itemDto
@@ -46,17 +47,17 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> get(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemResponseDto> get(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.findAll(userId);
     }
 
     @DeleteMapping("/{itemId}")
-    public ItemDto delete(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+    public ItemResponseDto delete(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
         return itemService.delete(userId, itemId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> findAvailable(
+    public List<ItemResponseDto> findAvailable(
             @RequestParam("text") String text
     ) {
         return itemService.findAvailableItemsBySearchQuery(text);

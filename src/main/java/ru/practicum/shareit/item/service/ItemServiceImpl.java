@@ -6,9 +6,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.CommentDtoMapper;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.item.mapper.CommentDtoMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoMapper;
+import ru.practicum.shareit.item.mapper.ItemDtoMapper;
 import ru.practicum.shareit.item.exception.ItemNotAvailableException;
 import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Comment;
@@ -51,27 +52,28 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto create(Long userId, ItemDto itemDto) {
+    public ItemResponseDto create(Long userId, ItemDto itemDto) {
         log.debug("Для пользователя с id = {} добавляется новый объект: {}", userId, itemDto);
         checkBeforeSave(userId, itemDto);
 
         Item savedItem = itemRepository.saveAndFlush(itemDtoMapper.mapDtoToItem(userId, itemDto));
         log.trace("Сохранённый предмет: {}", savedItem);
-        return itemDtoMapper.mapItemToDto(savedItem);
+        return itemDtoMapper.mapItemToResponseDto(savedItem);
     }
 
     @Override
-    public ItemDto read(Long userId, Long itemId) {
+    public ItemResponseDto read(Long userId, Long itemId) {
         log.debug("Пользователь с id = {} запросил объект с id = {}", userId, itemId);
         checkIfItemExist(itemId);
 
         Item resultItem = itemRepository.getReferenceById(itemId);
         log.trace("Найден объект {}", resultItem);
-        return itemDtoMapper.mapItemToDto(resultItem, userId.equals(resultItem.getOwnerId()));
+
+        return mapItemToResponseDto(resultItem, userId);
     }
 
     @Override
-    public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
+    public ItemResponseDto update(Long userId, Long itemId, ItemDto itemDto) {
         log.debug("Запрошено обновление объекта с id = {} ({}) для пользователя с id = {}", itemId, itemDto, userId);
         checkBeforeUpdate(userId, itemId);
 
@@ -79,11 +81,11 @@ public class ItemServiceImpl implements ItemService {
         updateItemFields(userId, savedItem, itemDto);
         itemRepository.flush();
         log.trace("Сохранённый предмет: {}", savedItem);
-        return itemDtoMapper.mapItemToDto(savedItem);
+        return mapItemToResponseDto(savedItem, userId);
     }
 
     @Override
-    public ItemDto delete(Long userId, Long itemId) {
+    public ItemResponseDto delete(Long userId, Long itemId) {
         log.debug("Для пользователя с id = {} удаляется предмет с id = {}", userId, itemId);
 
         checkIfUserExist(userId);
@@ -91,11 +93,11 @@ public class ItemServiceImpl implements ItemService {
         Item itemToDelete = itemRepository.getReferenceById(itemId);
         itemRepository.delete(itemToDelete);
         log.trace("Выполнено удаление предмета: {}", itemToDelete);
-        return itemDtoMapper.mapItemToDto(itemToDelete);
+        return mapItemToResponseDto(itemToDelete, userId);
     }
 
     @Override
-    public List<ItemDto> findAvailableItemsBySearchQuery(String searchQuery) {
+    public List<ItemResponseDto> findAvailableItemsBySearchQuery(String searchQuery) {
         log.debug("Запрошен поиск всех доступных вещей, содержащих '{}'", searchQuery);
         if (searchQuery.length() == 0) {
             return new ArrayList<>();
@@ -103,17 +105,18 @@ public class ItemServiceImpl implements ItemService {
 
         List<Item> foundItems = itemRepository.findAllAvailableAndContainingQueryIgnoreCase(searchQuery);
         log.trace("Найденные вещи: {}", foundItems);
-        return foundItems.stream().map(itemDtoMapper::mapItemToDto).collect(Collectors.toList());
+
+        return foundItems.stream().map(itemDtoMapper::mapItemToResponseDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> findAll(Long userId) {
+    public List<ItemResponseDto> findAll(Long userId) {
         log.debug("Для пользователя с id = {} запрошен список всех предметов", userId);
         checkIfUserExist(userId);
 
         List<Item> allUserItems = itemRepository.findAllByOwnerIdOrderByIdAsc(userId);
         log.trace("Получен массив предметов: {}", allUserItems);
-        return allUserItems.stream().map(item -> itemDtoMapper.mapItemToDto(item, true)).collect(Collectors.toList());
+        return allUserItems.stream().map(item -> mapItemToResponseDto(item, userId)).collect(Collectors.toList());
     }
 
     @Override
@@ -122,11 +125,11 @@ public class ItemServiceImpl implements ItemService {
                 "Пользователь с id = {} запросил добавление к предмету с id = {} комментария {}",
                 userId, itemId, commentDto
         );
-        commentDto.setItemId(itemId);
-        commentDto.setCreated(LocalDateTime.now());
         checkBeforeCommentSave(userId, itemId, commentDto);
 
-        Comment savedComment = commentRepository.saveAndFlush(commentDtoMapper.mapDtoToComment(commentDto, userId));
+        Comment savedComment = commentRepository.saveAndFlush(
+                commentDtoMapper.mapDtoToComment(commentDto, userId, itemId)
+        );
         log.trace("Результат сохранения комментария: {}", savedComment);
         return commentDtoMapper.mapCommentToDto(savedComment);
     }
@@ -207,6 +210,17 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(updatedItemDto.getAvailable());
         }
         log.trace("Обновлённая вещь: {}", item);
+    }
+
+    private ItemResponseDto mapItemToResponseDto(Item item, long requestedUserId) {
+        if (item.getOwnerId() == requestedUserId) {
+            return itemDtoMapper.mapItemToResponseDto(
+                    item,
+                    bookingRepository.getLastBooking(item.getId()),
+                    bookingRepository.getNextBooking(item.getId())
+            );
+        }
+        return itemDtoMapper.mapItemToResponseDto(item);
     }
 
 }
