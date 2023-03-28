@@ -2,7 +2,7 @@ package ru.practicum.shareit.booking.dto;
 
 import lombok.Data;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.user.dto.UserResponseDto;
 import java.time.LocalDateTime;
 
@@ -19,6 +19,6 @@ public class BookingResponseDto {
 
     private final UserResponseDto booker;
 
-    private final ItemDto item;
+    private final ItemResponseDto item;
 
 }

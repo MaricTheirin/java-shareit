@@ -33,7 +33,7 @@ public class BookingDtoMapper {
                 booking.getEnd(),
                 booking.getStatus(),
                 userDtoMapper.mapUserToResponseDto(booking.getBooker()),
-                itemDtoMapper.mapItemToDto(booking.getItem())
+                itemDtoMapper.mapItemToResponseDto(booking.getItem())
         );
         log.trace(OBJECT_MAPPED_MESSAGE, booking, resultDto);
         return resultDto;

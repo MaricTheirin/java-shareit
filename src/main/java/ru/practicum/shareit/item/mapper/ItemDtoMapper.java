@@ -16,22 +16,6 @@ public class ItemDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
 
-    public ItemDto mapItemToDto(Item item) {
-        return mapItemToDto(item, false);
-    }
-
-    public ItemDto mapItemToDto(Item item, boolean belongsToRequestedUser) {
-        ItemDto mappedDto = new ItemDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.isAvailable()
-        );
-
-        log.trace(OBJECT_MAPPED_MESSAGE, item, mappedDto);
-        return mappedDto;
-    }
-
     public ItemResponseDto mapItemToResponseDto(Item item) {
         return mapItemToResponseDto(item, null);
     }
