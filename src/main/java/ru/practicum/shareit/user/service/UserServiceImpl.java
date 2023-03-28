@@ -28,7 +28,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         log.debug("Запрошено сохранение пользователя: {}", userDto);
-        //checkBeforeSave(userDto);
 
         User savedUser = userRepository.save(userDtoMapper.mapDtoToUser(userDto));
         log.trace("Сохранённый пользователь: {}", savedUser);
