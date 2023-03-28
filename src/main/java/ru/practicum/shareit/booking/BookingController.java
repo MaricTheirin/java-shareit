@@ -31,7 +31,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     protected BookingResultDto review(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @PathVariable Long bookingId,
+            @PathVariable long bookingId,
             @RequestParam Boolean approved
     ) {
         return bookingService.review(userId, bookingId, approved);
@@ -48,7 +48,7 @@ public class BookingController {
     @GetMapping()
     protected List<BookingResultDto> getOwnBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(required = false, defaultValue = "ALL") String state
+            @RequestParam(defaultValue = "ALL") String state
     ) {
         return bookingService.findOwnBookings(userId, state);
     }
@@ -56,7 +56,7 @@ public class BookingController {
     @GetMapping("/owner")
     protected List<BookingResultDto> findOwnItemsBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(required = false, defaultValue = "ALL") String state
+            @RequestParam(defaultValue = "ALL") String state
     ) {
         return bookingService.findOwnItemsBookings(userId, state);
     }
