@@ -3,22 +3,16 @@ package ru.practicum.shareit.booking.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingDtoMapper;
-import ru.practicum.shareit.booking.dto.BookingResultDto;
-import ru.practicum.shareit.booking.exception.BookingException;
-import ru.practicum.shareit.booking.exception.BookingNotFoundException;
-import ru.practicum.shareit.booking.exception.BookingUnsupportedStateException;
-import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.item.exception.ItemNotAvailableException;
-import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.dto.*;
+import ru.practicum.shareit.booking.exception.*;
+import ru.practicum.shareit.booking.model.*;
+import ru.practicum.shareit.item.exception.*;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.service.exception.AccessException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,8 +43,12 @@ public class BookingServiceImpl implements BookingService {
     public BookingResultDto create(Long userId, BookingDto bookingDto) {
         log.debug("Пользователь с id = {} пытается взять в аренду: {}", userId, bookingDto);
         checkBeforeSave(userId, bookingDto);
+        Item item = itemRepository.getReferenceById(bookingDto.getItemId());
+        User booker = userRepository.getReferenceById(userId);
 
-        Booking savedBooking = bookingRepository.saveAndFlush(bookingDtoMapper.mapDtoToBooking(userId, bookingDto));
+        Booking savedBooking = bookingRepository.saveAndFlush(
+                bookingDtoMapper.mapDtoToBooking(bookingDto, item, booker)
+        );
         log.trace("Сохранённый предмет: {}", savedBooking);
         return bookingDtoMapper.mapBookingToResultDto(savedBooking);
     }
@@ -112,8 +110,8 @@ public class BookingServiceImpl implements BookingService {
     private void checkBeforeGet(Long userId, Booking booking) {
         checkIfUserExists(userId);
 
-        Item item = itemRepository.getReferenceById(booking.getItemId());
-        if (!userId.equals(booking.getBookerId()) && !userId.equals(item.getOwnerId())) {
+        Item item = booking.getItem();
+        if (!userId.equals(booking.getBooker().getId()) && !userId.equals(item.getOwner().getId())) {
             log.warn("Пользователь {} не имеет доступа к просмотру бронирования {}", userId, booking);
             throw new AccessException("Доступ запрещён");
         }
@@ -123,8 +121,7 @@ public class BookingServiceImpl implements BookingService {
         checkIfUserExists(userId);
         checkIfItemExists(bookingDto.getItemId());
 
-        Item item = itemRepository.getReferenceById(bookingDto.getItemId());
-        if (userId == item.getOwnerId()) {
+        if (checkIfItemIsOwnedByUser(bookingDto.getItemId(), userId)) {
             log.warn("Пользователь {} пытается забронировать свою же вещь с id {}", userId, bookingDto.getItemId());
             throw new BookingNotFoundException("Нельзя забронировать собственную вещь");
         }
@@ -144,9 +141,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingException("Нельзя изменить окончательный статус");
         }
         checkIfUserExists(userId);
-        checkIfItemExists(booking.getItemId());
-        Item item = itemRepository.getReferenceById(booking.getItemId());
-        if (item.getOwnerId() != userId) {
+        if (booking.getItem().getOwner().getId() != userId) {
             log.warn("Пользователь {} попытался обновить бронь чужого предмета {}", userId, booking);
             throw new BookingNotFoundException("Изменить статус бронирования может только владелец предмета");
         }
@@ -168,6 +163,10 @@ public class BookingServiceImpl implements BookingService {
         if (!bookingRepository.existsById(bookingId)) {
             throw new BookingNotFoundException("Запрошенная бронь не существует");
         }
+    }
+
+    private boolean checkIfItemIsOwnedByUser(long itemId, long userId) {
+        return itemRepository.existsItemByIdAndOwnerId(itemId, userId);
     }
 
     private BookingState findStateForUserString(String stringState) {

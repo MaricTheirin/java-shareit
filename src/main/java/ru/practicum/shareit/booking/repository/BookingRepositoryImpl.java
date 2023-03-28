@@ -57,12 +57,12 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
         List<Predicate> predicates = mapStateToPredicates(cb, root, state);
 
         if (searchBy.equals(SearchBy.USER_BOOKINGS)) {
-            predicates.add(cb.equal(root.get("bookerId"), userId));
+            predicates.add(cb.equal(root.get("booker").get("id"), userId));
         } else {
             //В дальнейшем костыль можно будет заменить на Join
             List<Long> userItems =
                     itemRepository.findAllByOwnerIdOrderByIdAsc(userId).stream().map(Item::getId).collect(Collectors.toList());
-            predicates.add(root.get("itemId").in(userItems));
+            predicates.add(root.get("item").get("id").in(userItems));
         }
 
         cq.select(root)
@@ -82,7 +82,6 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
             case CURRENT:
                 predicates.add(cb.lessThan(root.get("start"), now));
                 predicates.add(cb.greaterThan(root.get("end"), now));
-                //predicates.add(cb.equal(root.get("status"), BookingStatus.APPROVED));
                 break;
             case PAST:
                 predicates.add(cb.lessThan(root.get("end"), now));

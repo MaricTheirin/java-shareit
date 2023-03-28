@@ -24,6 +24,6 @@ public class ItemResponseDto {
 
     private BookingDto nextBooking;
 
-    private List<CommentDto> comments;
+    private List<CommentResponseDto> comments;
 
 }
