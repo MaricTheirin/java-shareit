@@ -100,6 +100,7 @@ public class DefaultExceptionHandler {
             EntityNotFoundException exception,
             HttpServletRequest request
     ) {
+        logException(exception, request);
         return new ResponseEntity<>(
                 new ExceptionMessage("Запрошенная информация не обнаружена", request.getRequestURI()),
                 HttpStatus.NOT_FOUND
