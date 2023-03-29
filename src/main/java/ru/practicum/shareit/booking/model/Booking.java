@@ -21,10 +21,12 @@ public class Booking {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "item_id", nullable = false)
+    @ToString.Exclude
     private Item item;
 
     @ManyToOne
     @JoinColumn(name = "booker_id", nullable = false)
+    @ToString.Exclude
     private User booker;
 
     @Column(name = "start_date")
@@ -33,7 +35,6 @@ public class Booking {
     @Column(name = "end_date")
     private LocalDateTime end;
 
-    @Column
     @Enumerated(EnumType.ORDINAL)
     private BookingStatus status = BookingStatus.WAITING;
 

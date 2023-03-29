@@ -20,19 +20,19 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
     @Length(max = 256)
     private String text;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "item_id", nullable = false)
+    @ToString.Exclude
     private Item item;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "author_id", nullable = false)
+    @ToString.Exclude
     private User author;
 
-    @Column
     @CreationTimestamp
     private LocalDateTime created;
 

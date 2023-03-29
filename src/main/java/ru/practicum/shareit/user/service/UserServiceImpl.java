@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,16 +16,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserDtoMapper userDtoMapper;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserDtoMapper userDtoMapper) {
-        this.userRepository = userRepository;
-        this.userDtoMapper = userDtoMapper;
-    }
 
     @Override
     @Transactional

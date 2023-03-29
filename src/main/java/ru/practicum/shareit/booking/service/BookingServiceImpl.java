@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,25 +22,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final BookingDtoMapper bookingDtoMapper;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-
-    @Autowired
-    public BookingServiceImpl(
-            BookingRepository bookingRepository,
-            BookingDtoMapper bookingDtoMapper,
-            ItemRepository itemRepository,
-            UserRepository userRepository
-    ) {
-        this.bookingRepository = bookingRepository;
-        this.bookingDtoMapper = bookingDtoMapper;
-        this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
-    }
 
     @Override
     @Transactional
@@ -136,7 +125,7 @@ public class BookingServiceImpl implements BookingService {
             log.warn("Пользователь {} пытается забронировать недоступную вещь с id {}", userId, bookingDto.getItemId());
             throw new ItemNotAvailableException("В настоящее время аренда предмета запрещена");
         }
-        if (bookingDto.getStart().isAfter(bookingDto.getEnd()) || bookingDto.getStart().isEqual(bookingDto.getEnd())) {
+        if (!bookingDto.getStart().isBefore(bookingDto.getEnd())) {
             log.warn("Дата окончания бронирования не может быть раньше даты начала");
             throw new BookingException("Дата окончания бронирования не может быть раньше даты начала");
         }

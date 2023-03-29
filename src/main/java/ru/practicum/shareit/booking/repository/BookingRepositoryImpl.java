@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.repository;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.model.Booking;
@@ -16,16 +17,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingRepositoryImpl implements BookingRepositoryCustom {
 
     @PersistenceContext
     private EntityManager entityManager;
     private final ItemRepository itemRepository;
-
-    @Autowired
-    public BookingRepositoryImpl(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
 
     private enum SearchBy {
         USER_ITEMS,

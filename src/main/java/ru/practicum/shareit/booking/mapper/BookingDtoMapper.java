@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.mapper;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,17 +15,12 @@ import ru.practicum.shareit.user.model.User;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
     private final UserDtoMapper userDtoMapper;
     private final ItemDtoMapper itemDtoMapper;
-
-    @Autowired
-    public BookingDtoMapper(UserDtoMapper userDtoMapper, ItemDtoMapper itemDtoMapper) {
-        this.userDtoMapper = userDtoMapper;
-        this.itemDtoMapper = itemDtoMapper;
-    }
 
     public BookingResponseDto mapBookingToResultDto(Booking booking) {
         BookingResponseDto resultDto = new BookingResponseDto(

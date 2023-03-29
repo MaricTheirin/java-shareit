@@ -20,15 +20,13 @@ public class Item {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "owner_id", nullable = false)
+    @ToString.Exclude
     private User owner;
 
-    @Column
     private String name;
 
-    @Column
     private String description;
 
-    @Column
     private boolean available;
 
 }
