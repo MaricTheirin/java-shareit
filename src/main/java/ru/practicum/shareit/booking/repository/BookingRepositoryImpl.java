@@ -1,20 +1,16 @@
 package ru.practicum.shareit.booking.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.booking.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -22,7 +18,6 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 
     @PersistenceContext
     private EntityManager entityManager;
-    private final ItemRepository itemRepository;
 
     private enum SearchBy {
         USER_ITEMS,
@@ -30,70 +25,47 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
     }
 
     @Override
-    public List<Booking> findAllByUserItemsAndFilterByState(
-            Long userId,
-            BookingState state
-    ) {
-        return findAndFilter(userId, state, SearchBy.USER_ITEMS);
+    public List<Booking> findAllByUserItemsAndFilterByState(Long userId, BookingState state) {
+        return findBookingsByUserAndState(userId, state, SearchBy.USER_ITEMS);
     }
 
     @Override
-    public List<Booking> findAllByUserBookingsAndFilterByState(
-            Long userId,
-            BookingState state
-    ) {
-        return findAndFilter(userId, state, SearchBy.USER_BOOKINGS);
+    public List<Booking> findAllByUserBookingsAndFilterByState(Long userId, BookingState state) {
+        return findBookingsByUserAndState(userId, state, SearchBy.USER_BOOKINGS);
     }
 
+    private List<Booking> findBookingsByUserAndState (long userId, BookingState state, SearchBy searchBy) {
 
-    private List<Booking> findAndFilter(Long userId, BookingState state, SearchBy searchBy) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Booking> cq = cb.createQuery(Booking.class);
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+        QBooking booking = QBooking.booking;
 
-        Root<Booking> root = cq.from(Booking.class);
-        List<Predicate> predicates = mapStateToPredicates(cb, root, state);
+        BooleanExpression bookingsMadeByUser = booking.booker.id.eq(userId);
+        BooleanExpression itemsOwnedByUser = booking.item.owner.id.eq(userId);
+        BooleanExpression searchFields = (searchBy == SearchBy.USER_BOOKINGS) ? bookingsMadeByUser : itemsOwnedByUser;
 
-        if (searchBy.equals(SearchBy.USER_BOOKINGS)) {
-            predicates.add(cb.equal(root.get("booker").get("id"), userId));
-        } else {
-            //В дальнейшем костыль можно будет заменить на Join
-            List<Long> userItems =
-                    itemRepository.findAllByOwnerIdOrderByIdAsc(userId).stream().map(Item::getId).collect(Collectors.toList());
-            predicates.add(root.get("item").get("id").in(userItems));
-        }
+        BooleanExpression filterByState = mapBookingStateToPredicate(state);
 
-        cq.select(root)
-                .where(predicates.toArray(new Predicate[]{}))
-                .orderBy(cb.desc(root.get("start")))
-        ;
-        return entityManager.createQuery(cq).getResultList();
+        return queryFactory
+                .selectFrom(booking)
+                .where(searchFields.and(filterByState))
+                .orderBy(booking.start.desc())
+                .fetch();
     }
 
-    private List<Predicate> mapStateToPredicates(CriteriaBuilder cb, Root<Booking> root, BookingState state) {
-        List<Predicate> predicates = new ArrayList<>();
+    private BooleanExpression mapBookingStateToPredicate(BookingState state) {
         LocalDateTime now = LocalDateTime.now();
 
         switch (state) {
+            case CURRENT: return QBooking.booking.start.before(now).and(QBooking.booking.end.after(now));
+            case PAST: return QBooking.booking.end.before(now);
+            case FUTURE: return QBooking.booking.start.after(now);
+            case WAITING: return QBooking.booking.status.eq(BookingStatus.WAITING);
+            case REJECTED: return QBooking.booking.status.eq(BookingStatus.REJECTED);
             case ALL:
-                break;
-            case CURRENT:
-                predicates.add(cb.lessThan(root.get("start"), now));
-                predicates.add(cb.greaterThan(root.get("end"), now));
-                break;
-            case PAST:
-                predicates.add(cb.lessThan(root.get("end"), now));
-                break;
-            case FUTURE:
-                predicates.add(cb.greaterThan(root.get("start"), now));
-                break;
-            case WAITING:
-                predicates.add(cb.equal(root.get("status"), BookingStatus.WAITING));
-                break;
-            case REJECTED:
-                predicates.add(cb.equal(root.get("status"), BookingStatus.REJECTED));
-                break;
+            default:
+                return Expressions.TRUE.isTrue();
         }
-        return predicates;
     }
+
 
 }
