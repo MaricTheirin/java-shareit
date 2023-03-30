@@ -90,8 +90,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public List<ItemResponseDto> findAvailableItemsBySearchQuery(String searchQuery) {
         log.debug("Запрошен поиск всех доступных вещей, содержащих '{}'", searchQuery);
-        if (searchQuery.length() == 0) {
-            return new ArrayList<>();
+        if (searchQuery.isBlank()) {
+            return Collections.emptyList();
         }
 
         List<Item> foundItems = itemRepository.findAllAvailableAndContainingQueryIgnoreCase(searchQuery);
@@ -240,8 +240,8 @@ public class ItemServiceImpl implements ItemService {
 
     private void addLastAndNextBookingForItem(ItemResponseDto item) {
         BookingStatus statusToInclude = BookingStatus.APPROVED;
-        List<BookingShort> lastBookings = bookingRepository.getLastBookingsForItem(item.getId(), statusToInclude);
-        List<BookingShort> nextBookings = bookingRepository.getNextBookingsForItem(item.getId(), statusToInclude);
+        List<BookingShort> lastBookings = bookingRepository.getLastBookingsForItems(Set.of(item.getId()), statusToInclude);
+        List<BookingShort> nextBookings = bookingRepository.getNextBookingsForItems(Set.of(item.getId()), statusToInclude);
 
         item.setLastBooking(getFirstBooking(item.getId(), lastBookings));
         item.setNextBooking(getFirstBooking(item.getId(), nextBookings));
