@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingShort;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.mapper.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -46,6 +48,14 @@ public class BookingDtoMapper {
         );
         log.trace(OBJECT_MAPPED_MESSAGE, bookingDto, mappedBooking);
         return mappedBooking;
+    }
+
+    public BookingShortResponseDto mapBookingShortToDto(BookingShort bookingShort) {
+        BookingShortResponseDto shortResponseDto =  new BookingShortResponseDto(
+                bookingShort.getId(), bookingShort.getBooker().getId(), bookingShort.getStart(), bookingShort.getEnd()
+        );
+        log.trace(OBJECT_MAPPED_MESSAGE, bookingShort, shortResponseDto);
+        return shortResponseDto;
     }
 
 }
