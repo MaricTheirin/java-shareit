@@ -228,6 +228,14 @@ public class ItemServiceImpl implements ItemService {
         return mappedItems;
     }
 
+    private void addLastAndNextBookingForItem(ItemResponseDto item) {
+        addLastAndNextBookingForItems(Map.of(item.getId(), item));
+    }
+
+    private void addCommentsForItem(ItemResponseDto item) {
+        addCommentsForItems(Map.of(item.getId(), item));
+    }
+
     private void addLastAndNextBookingForItems(Map<Long, ItemResponseDto> items) {
         BookingStatus statusToInclude = BookingStatus.APPROVED;
 
@@ -252,20 +260,6 @@ public class ItemServiceImpl implements ItemService {
 
     }
 
-    private void addLastAndNextBookingForItem(ItemResponseDto item) {
-        BookingStatus statusToInclude = BookingStatus.APPROVED;
-        List<BookingShort> lastBookings = bookingRepository.getLastBookingsForItems(Set.of(item.getId()), statusToInclude);
-        List<BookingShort> nextBookings = bookingRepository.getNextBookingsForItems(Set.of(item.getId()), statusToInclude);
-
-        item.setLastBooking(getFirstBooking(item.getId(), lastBookings));
-        item.setNextBooking(getFirstBooking(item.getId(), nextBookings));
-    }
-
-    private void addCommentsForItem(ItemResponseDto item) {
-        List<Comment> comments = commentRepository.findAllByItemId(item.getId());
-        item.setComments(comments.stream().map(commentDtoMapper::mapCommentToResponseDto).collect(Collectors.toList()));
-    }
-
     private void addCommentsForItems(Map<Long, ItemResponseDto> items) {
         Map<Long, List<CommentResponseDto>> comments = commentRepository
                 .findAllByItemIdIn(items.keySet())
@@ -274,14 +268,6 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.groupingBy(CommentResponseDto::getItemId, Collectors.toList()));
 
         items.values().forEach(item -> item.setComments(comments.getOrDefault(item.getId(), Collections.emptyList())));
-    }
-
-    private BookingShortResponseDto getFirstBooking(long itemId, List<BookingShort> bookings) {
-        return bookings.stream()
-                .filter(x -> x.getItemId() == itemId)
-                .findFirst()
-                .map(bookingDtoMapper::mapBookingShortToDto)
-                .orElse(null);
     }
 
 }
