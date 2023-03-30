@@ -231,11 +231,25 @@ public class ItemServiceImpl implements ItemService {
     private void addLastAndNextBookingForItems(Map<Long, ItemResponseDto> items) {
         BookingStatus statusToInclude = BookingStatus.APPROVED;
 
-        List<BookingShort> lastBookings = bookingRepository.getLastBookingsForItems(items.keySet(), statusToInclude);
-        List<BookingShort> nextBookings = bookingRepository.getNextBookingsForItems(items.keySet(), statusToInclude);
+        Map<Long, BookingShort> lastBookings = bookingRepository
+                .getLastBookingsForItems(items.keySet(), statusToInclude)
+                .stream()
+                .collect(Collectors.toMap(BookingShort::getItemId, Function.identity(), (o, n) -> o));
 
-        items.values().forEach(item -> item.setLastBooking(getFirstBooking(item.getId(), lastBookings)));
-        items.values().forEach(item -> item.setNextBooking(getFirstBooking(item.getId(), nextBookings)));
+        Map<Long, BookingShort> nextBookings = bookingRepository
+                .getNextBookingsForItems(items.keySet(), statusToInclude)
+                .stream()
+                .collect(Collectors.toMap(BookingShort::getItemId, Function.identity(), (o, n) -> o));
+
+        items.values().forEach(item -> {
+            if (lastBookings.containsKey(item.getId())) {
+                item.setLastBooking(bookingDtoMapper.mapBookingShortToDto(lastBookings.get(item.getId())));
+            }
+            if (nextBookings.containsKey(item.getId())) {
+                item.setNextBooking(bookingDtoMapper.mapBookingShortToDto(nextBookings.get(item.getId())));
+            }
+        });
+
     }
 
     private void addLastAndNextBookingForItem(ItemResponseDto item) {
