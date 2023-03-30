@@ -35,7 +35,6 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
     }
 
     private List<Booking> findBookingsByUserAndState (long userId, BookingState state, SearchBy searchBy) {
-
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         QBooking booking = QBooking.booking;
 

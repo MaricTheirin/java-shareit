@@ -5,26 +5,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
+import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
+import ru.practicum.shareit.booking.model.BookingShort;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.CommentResponseDto;
-import ru.practicum.shareit.item.dto.ItemResponseDto;
-import ru.practicum.shareit.item.mapper.CommentDtoMapper;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemDtoMapper;
-import ru.practicum.shareit.item.exception.ItemNotAvailableException;
-import ru.practicum.shareit.item.exception.ItemNotFoundException;
-import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.CommentRepository;
-import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.mapper.*;
+import ru.practicum.shareit.item.exception.*;
+import ru.practicum.shareit.item.model.*;
+import ru.practicum.shareit.item.repository.*;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,6 +34,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final BookingDtoMapper bookingDtoMapper;
 
     @Override
     @Transactional
@@ -111,7 +108,8 @@ public class ItemServiceImpl implements ItemService {
 
         List<Item> allUserItems = itemRepository.findAllByOwnerIdOrderByIdAsc(userId);
         log.trace("Получен массив предметов: {}", allUserItems);
-        return allUserItems.stream().map(item -> mapItemToResponseDto(item, userId)).collect(Collectors.toList());
+        return new ArrayList<>(mapItemsToResponseDto(allUserItems).values());
+
     }
 
     @Override
@@ -211,22 +209,65 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private ItemResponseDto mapItemToResponseDto(Item item, long requestedUserId) {
-        List<CommentResponseDto> itemComments = commentRepository
-                .findAllByItemId(item.getId())
-                .stream()
-                .map(commentDtoMapper::mapCommentToResponseDto)
-                .collect(Collectors.toList());
-
-        if (requestedUserId != item.getOwner().getId()) {
-            return itemDtoMapper.mapItemToResponseDto(item, itemComments);
+        ItemResponseDto responseDto = itemDtoMapper.mapItemToResponseDto(item);
+        if (requestedUserId == item.getOwner().getId()) {
+            addLastAndNextBookingForItem(responseDto);
         }
 
-        return itemDtoMapper.mapItemToResponseDto(
-                item,
-                bookingRepository.getLastBooking(item.getId()),
-                bookingRepository.getNextBooking(item.getId()),
-                itemComments
-        );
+        addCommentsForItem(responseDto);
+        return responseDto;
+    }
+
+    private Map<Long, ItemResponseDto> mapItemsToResponseDto(List<Item> items) {
+        Map<Long, ItemResponseDto> mappedItems =  items.stream()
+                .map(itemDtoMapper::mapItemToResponseDto)
+                .collect(Collectors.toMap(ItemResponseDto::getId, Function.identity()));
+
+        addLastAndNextBookingForItems(mappedItems);
+        addCommentsForItems(mappedItems);
+        return mappedItems;
+    }
+
+    private void addLastAndNextBookingForItems(Map<Long, ItemResponseDto> items) {
+        BookingStatus statusToInclude = BookingStatus.APPROVED;
+
+        List<BookingShort> lastBookings = bookingRepository.getLastBookingsForItems(items.keySet(), statusToInclude);
+        List<BookingShort> nextBookings = bookingRepository.getNextBookingsForItems(items.keySet(), statusToInclude);
+
+        items.values().forEach(item -> item.setLastBooking(getFirstBooking(item.getId(), lastBookings)));
+        items.values().forEach(item -> item.setNextBooking(getFirstBooking(item.getId(), nextBookings)));
+    }
+
+    private void addLastAndNextBookingForItem(ItemResponseDto item) {
+        BookingStatus statusToInclude = BookingStatus.APPROVED;
+        List<BookingShort> lastBookings = bookingRepository.getLastBookingsForItem(item.getId(), statusToInclude);
+        List<BookingShort> nextBookings = bookingRepository.getNextBookingsForItem(item.getId(), statusToInclude);
+
+        item.setLastBooking(getFirstBooking(item.getId(), lastBookings));
+        item.setNextBooking(getFirstBooking(item.getId(), nextBookings));
+    }
+
+    private void addCommentsForItem(ItemResponseDto item) {
+        List<Comment> comments = commentRepository.findAllByItemId(item.getId());
+        item.setComments(comments.stream().map(commentDtoMapper::mapCommentToResponseDto).collect(Collectors.toList()));
+    }
+
+    private void addCommentsForItems(Map<Long, ItemResponseDto> items) {
+        Map<Long, List<CommentResponseDto>> comments = commentRepository
+                .findAllByItemIdIn(items.keySet())
+                .stream()
+                .map(commentDtoMapper::mapCommentToResponseDto)
+                .collect(Collectors.groupingBy(CommentResponseDto::getItemId, Collectors.toList()));
+
+        items.values().forEach(item -> item.setComments(comments.getOrDefault(item.getId(), Collections.emptyList())));
+    }
+
+    private BookingShortResponseDto getFirstBooking(long itemId, List<BookingShort> bookings) {
+        return bookings.stream()
+                .filter(x -> x.getItemId() == itemId)
+                .findFirst()
+                .map(bookingDtoMapper::mapBookingShortToDto)
+                .orElse(null);
     }
 
 }
