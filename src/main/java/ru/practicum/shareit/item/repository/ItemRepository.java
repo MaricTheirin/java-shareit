@@ -1,24 +1,33 @@
 package ru.practicum.shareit.item.repository;
 
+import org.hibernate.validator.constraints.Length;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
-public interface ItemRepository {
+@Validated
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Item save(Item item);
+    Item getItemByIdEqualsAndOwnerIdEquals(Long id, Long ownerId);
 
-    Item get(Long itemId);
+    List<Item> findAllByOwnerIdOrderByIdAsc(Long ownerId);
 
-    Item update(Item item);
+    @Query("SELECT new ru.practicum.shareit.item.model.Item(it.id, u, it.name, it.description, it.available) " +
+            "FROM Item AS it " +
+            "JOIN User u ON it.owner = u " +
+            "WHERE it.available = TRUE AND (" +
+                "lower(it.name)        LIKE lower(concat('%', :searchQuery, '%')) OR " +
+                "lower(it.description) LIKE lower(concat('%', :searchQuery, '%')) " +
+            ")"
+    )
+    List<Item> findAllAvailableAndContainingQueryIgnoreCase(
+            @Length(min = 1, message = "Запрос не может быть пустым") String searchQuery
+    );
 
-    Item delete(Long userId, Long itemId);
+    Boolean existsItemByIdAndAvailableIsTrue(Long itemId);
 
-    List<Item> findAll(Long userId);
-
-    List<Item> findAvailable(String searchQuery);
-
-    boolean isExist(Long itemId);
-
-    boolean isExistAndBelongsToUser(Long userId, Long itemId);
+    boolean existsItemByIdAndOwnerId(long itemId, long userId);
 
 }

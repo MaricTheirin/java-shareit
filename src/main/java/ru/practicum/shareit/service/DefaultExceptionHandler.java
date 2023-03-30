@@ -1,6 +1,7 @@
 package ru.practicum.shareit.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -8,7 +9,11 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.practicum.shareit.service.exception.ShareItException;
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -51,15 +56,54 @@ public class DefaultExceptionHandler {
         );
     }
 
-
-    @ExceptionHandler({Throwable.class})
-    protected ResponseEntity<ExceptionMessage> handleException(
-            Throwable exception,
+    @ExceptionHandler({DataIntegrityViolationException.class})
+    protected ResponseEntity<ExceptionMessage> handleDataIntegrityViolationException(
+            DataIntegrityViolationException exception,
             HttpServletRequest request
     ) {
         logException(exception, request);
         return new ResponseEntity<>(
-                new ExceptionMessage(exception, request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR
+                new ExceptionMessage("Нарушение корректности данных", request.getRequestURI()),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler({SQLException.class})
+    protected ResponseEntity<ExceptionMessage> handleSQLException(
+            SQLException exception,
+            HttpServletRequest request
+    ) {
+        logException(exception, request);
+        return new ResponseEntity<>(
+                new ExceptionMessage("Ошибка SQL: " + exception.getMessage(), request.getRequestURI()),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<ExceptionMessage> handleConstraintViolationException(
+            ConstraintViolationException exception,
+            HttpServletRequest request
+    ) {
+        logException(exception, request);
+        String errorMessage = exception.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessageTemplate)
+                .collect(Collectors.joining("; "));
+        return new ResponseEntity<>(
+                new ExceptionMessage("Ошибка при проверке: " + errorMessage, request.getRequestURI()),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    protected ResponseEntity<ExceptionMessage> handleEntityNotFoundException(
+            EntityNotFoundException exception,
+            HttpServletRequest request
+    ) {
+        logException(exception, request);
+        return new ResponseEntity<>(
+                new ExceptionMessage("Запрошенная информация не обнаружена", request.getRequestURI()),
+                HttpStatus.NOT_FOUND
         );
     }
 
