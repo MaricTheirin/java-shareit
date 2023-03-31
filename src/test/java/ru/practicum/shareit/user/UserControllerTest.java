@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = UserController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserControllerTest {
-    
+
     @Autowired
     private final ObjectMapper objectMapper;
 
@@ -36,7 +36,7 @@ public class UserControllerTest {
     private final UserResponseDto responseDto = new UserResponseDto(1L, "name", "user@server.com");
 
     @Test
-    void create() throws Exception {
+    void createTest() throws Exception {
 
         Mockito.when(userService.create(Mockito.any())).thenReturn(responseDto);
 
@@ -52,7 +52,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void read() throws Exception {
+    void readTest() throws Exception {
 
         Mockito.when(userService.read(1L)).thenReturn(responseDto);
 
@@ -68,7 +68,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void update() throws Exception {
+    void updateTest() throws Exception {
 
         UserDto userUpdatedDto =
                 new UserDto(1L, "updatedUser", "updatedEmail");
@@ -90,12 +90,12 @@ public class UserControllerTest {
     }
 
     @Test
-    void delete() throws Exception {
+    void deleteTest() throws Exception {
 
         Mockito.when(userService.delete(Mockito.anyLong()))
                 .thenReturn(responseDto);
 
-        mockMvc.perform(patch("/users/{userId}", 1L)
+        mockMvc.perform(delete("/users/{userId}", 1L)
                         .content(objectMapper.writeValueAsString(dto))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -107,7 +107,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void findAll() throws Exception {
+    void findAllTest() throws Exception {
         Mockito.when(userService.findAll()).thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/users")
