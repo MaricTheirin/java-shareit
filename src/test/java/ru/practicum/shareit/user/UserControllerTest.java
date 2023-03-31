@@ -47,8 +47,8 @@ public class UserControllerTest {
                     .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Is.is(1L), Long.class))
-                .andExpect(jsonPath("$.name", Is.is(responseDto.getName()), String.class))
-                .andExpect(jsonPath("$.email", Is.is(responseDto.getEmail()), String.class));
+                .andExpect(jsonPath("$.name", Is.is(responseDto.getName())))
+                .andExpect(jsonPath("$.email", Is.is(responseDto.getEmail())));
     }
 
     @Test
@@ -63,8 +63,8 @@ public class UserControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Is.is(1L), Long.class))
-                .andExpect(jsonPath("$.name", Is.is(responseDto.getName()), String.class))
-                .andExpect(jsonPath("$.email", Is.is(responseDto.getEmail()), String.class));
+                .andExpect(jsonPath("$.name", Is.is(responseDto.getName())))
+                .andExpect(jsonPath("$.email", Is.is(responseDto.getEmail())));
     }
 
     @Test
@@ -85,8 +85,8 @@ public class UserControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Is.is(1L), Long.class))
-                .andExpect(jsonPath("$.name", Is.is(userUpdatedResponseDto.getName()), String.class))
-                .andExpect(jsonPath("$.email", Is.is(userUpdatedResponseDto.getEmail()), String.class));
+                .andExpect(jsonPath("$.name", Is.is(userUpdatedResponseDto.getName())))
+                .andExpect(jsonPath("$.email", Is.is(userUpdatedResponseDto.getEmail())));
     }
 
     @Test
@@ -102,8 +102,8 @@ public class UserControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Is.is(1L), Long.class))
-                .andExpect(jsonPath("$.name", Is.is(dto.getName()), String.class))
-                .andExpect(jsonPath("$.email", Is.is(dto.getEmail()), String.class));
+                .andExpect(jsonPath("$.name", Is.is(dto.getName())))
+                .andExpect(jsonPath("$.email", Is.is(dto.getEmail())));
     }
 
     @Test
@@ -115,10 +115,10 @@ public class UserControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", Is.is(1), Integer.class))
+                .andExpect(jsonPath("$.length()", Is.is(1)))
                 .andExpect(jsonPath("$[0].id", Is.is(responseDto.getId()), Long.class))
-                .andExpect(jsonPath("$[0].name", Is.is(responseDto.getName()), String.class))
-                .andExpect(jsonPath("$[0].email", Is.is(responseDto.getEmail()), String.class));
+                .andExpect(jsonPath("$[0].name", Is.is(responseDto.getName())))
+                .andExpect(jsonPath("$[0].email", Is.is(responseDto.getEmail())));
 
     }
 

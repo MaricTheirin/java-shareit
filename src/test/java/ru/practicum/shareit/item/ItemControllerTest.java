@@ -82,9 +82,9 @@ public class ItemControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Is.is(responseDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", Is.is(responseDto.getName()), String.class))
-                .andExpect(jsonPath("$.description", Is.is(responseDto.getDescription()), String.class))
-                .andExpect(jsonPath("$.available", Is.is(responseDto.getAvailable()), Boolean.class))
+                .andExpect(jsonPath("$.name", Is.is(responseDto.getName())))
+                .andExpect(jsonPath("$.description", Is.is(responseDto.getDescription())))
+                .andExpect(jsonPath("$.available", Is.is(responseDto.getAvailable())))
                 .andExpect(jsonPath("$.lastBooking", Is.is(responseDto.getLastBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$.nextBooking", Is.is(responseDto.getNextBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$.comments", hasSize(0)));
@@ -105,9 +105,9 @@ public class ItemControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Is.is(responseDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", Is.is(responseDto.getName()), String.class))
-                .andExpect(jsonPath("$.description", Is.is(responseDto.getDescription()), String.class))
-                .andExpect(jsonPath("$.available", Is.is(responseDto.getAvailable()), Boolean.class))
+                .andExpect(jsonPath("$.name", Is.is(responseDto.getName())))
+                .andExpect(jsonPath("$.description", Is.is(responseDto.getDescription())))
+                .andExpect(jsonPath("$.available", Is.is(responseDto.getAvailable())))
                 .andExpect(jsonPath("$.lastBooking", Is.is(responseDto.getLastBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$.nextBooking", Is.is(responseDto.getNextBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$.comments", hasSize(0)));
@@ -127,9 +127,9 @@ public class ItemControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Is.is(responseDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", Is.is(responseDto.getName()), String.class))
-                .andExpect(jsonPath("$.description", Is.is(responseDto.getDescription()), String.class))
-                .andExpect(jsonPath("$.available", Is.is(responseDto.getAvailable()), Boolean.class))
+                .andExpect(jsonPath("$.name", Is.is(responseDto.getName())))
+                .andExpect(jsonPath("$.description", Is.is(responseDto.getDescription())))
+                .andExpect(jsonPath("$.available", Is.is(responseDto.getAvailable())))
                 .andExpect(jsonPath("$.lastBooking", Is.is(responseDto.getLastBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$.nextBooking", Is.is(responseDto.getNextBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$.comments", hasSize(0)));
@@ -148,9 +148,9 @@ public class ItemControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Is.is(responseDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", Is.is(responseDto.getName()), String.class))
-                .andExpect(jsonPath("$.description", Is.is(responseDto.getDescription()), String.class))
-                .andExpect(jsonPath("$.available", Is.is(responseDto.getAvailable()), Boolean.class))
+                .andExpect(jsonPath("$.name", Is.is(responseDto.getName())))
+                .andExpect(jsonPath("$.description", Is.is(responseDto.getDescription())))
+                .andExpect(jsonPath("$.available", Is.is(responseDto.getAvailable())))
                 .andExpect(jsonPath("$.lastBooking", Is.is(responseDto.getLastBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$.nextBooking", Is.is(responseDto.getNextBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$.comments", hasSize(0)));
@@ -171,9 +171,9 @@ public class ItemControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", Is.is(responseDto.getId()), Long.class))
-                .andExpect(jsonPath("$[0].name", Is.is(responseDto.getName()), String.class))
-                .andExpect(jsonPath("$[0].description", Is.is(responseDto.getDescription()), String.class))
-                .andExpect(jsonPath("$[0].available", Is.is(responseDto.getAvailable()), Boolean.class))
+                .andExpect(jsonPath("$[0].name", Is.is(responseDto.getName())))
+                .andExpect(jsonPath("$[0].description", Is.is(responseDto.getDescription())))
+                .andExpect(jsonPath("$[0].available", Is.is(responseDto.getAvailable())))
                 .andExpect(jsonPath("$[0].lastBooking", Is.is(responseDto.getLastBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$[0].nextBooking", Is.is(responseDto.getNextBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$[0].comments", hasSize(0)));
@@ -193,9 +193,9 @@ public class ItemControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", Is.is(responseDto.getId()), Long.class))
-                .andExpect(jsonPath("$[0].name", Is.is(responseDto.getName()), String.class))
-                .andExpect(jsonPath("$[0].description", Is.is(responseDto.getDescription()), String.class))
-                .andExpect(jsonPath("$[0].available", Is.is(responseDto.getAvailable()), Boolean.class))
+                .andExpect(jsonPath("$[0].name", Is.is(responseDto.getName())))
+                .andExpect(jsonPath("$[0].description", Is.is(responseDto.getDescription())))
+                .andExpect(jsonPath("$[0].available", Is.is(responseDto.getAvailable())))
                 .andExpect(jsonPath("$[0].lastBooking", Is.is(responseDto.getLastBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$[0].nextBooking", Is.is(responseDto.getNextBooking()), BookingShortResponseDto.class))
                 .andExpect(jsonPath("$[0].comments", hasSize(0)));
@@ -215,10 +215,10 @@ public class ItemControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Is.is(commentResponseDto.getId()), Long.class))
-                .andExpect(jsonPath("$.text", Is.is(commentResponseDto.getText()), String.class))
+                .andExpect(jsonPath("$.text", Is.is(commentResponseDto.getText())))
                 .andExpect(jsonPath("$.itemId", Is.is(commentResponseDto.getItemId()), Long.class))
-                .andExpect(jsonPath("$.authorName", Is.is(commentResponseDto.getAuthorName()), String.class))
-                .andExpect(jsonPath("$.created", Is.is(commentResponseDto.getCreated().toString()), String.class));
+                .andExpect(jsonPath("$.authorName", Is.is(commentResponseDto.getAuthorName())))
+                .andExpect(jsonPath("$.created", Is.is(commentResponseDto.getCreated().toString())));
     }
 
 }
