@@ -66,7 +66,6 @@ public class ItemServiceImpl implements ItemService {
 
         Item savedItem = itemRepository.getReferenceById(itemId);
         updateItemFields(userId, savedItem, itemDto);
-        itemRepository.flush();
         log.trace("Сохранённый предмет: {}", savedItem);
         return mapItemToResponseDto(savedItem, userId);
     }
