@@ -4,7 +4,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.model.*;
 import javax.persistence.EntityManager;
@@ -13,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 public class BookingRepositoryImpl implements BookingRepositoryCustom {
 
     @PersistenceContext
