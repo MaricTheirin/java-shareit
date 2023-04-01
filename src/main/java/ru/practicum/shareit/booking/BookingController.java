@@ -5,6 +5,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.service.validation.Create;
 import java.util.List;
@@ -44,7 +45,7 @@ public class BookingController {
     @GetMapping
     protected List<BookingResponseDto> getOwnBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(name = "from", defaultValue = "0") long from,
             @RequestParam(name = "size", defaultValue = "20") long size
     ) {
@@ -54,7 +55,7 @@ public class BookingController {
     @GetMapping("/owner")
     protected List<BookingResponseDto> findOwnItemsBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(name = "from", defaultValue = "0") long from,
             @RequestParam(name = "size", defaultValue = "20") long size
     ) {
