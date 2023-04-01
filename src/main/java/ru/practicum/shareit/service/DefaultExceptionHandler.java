@@ -107,6 +107,18 @@ public class DefaultExceptionHandler {
         );
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<ExceptionMessage> handleIllegalArgumentException(
+            IllegalArgumentException exception,
+            HttpServletRequest request
+    ) {
+        logException(exception, request);
+        return new ResponseEntity<>(
+                new ExceptionMessage("Некорректный запрос", request.getRequestURI()),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
     private void logException(Throwable throwable, HttpServletRequest request) {
         log.debug(
                 "В ответ на запрос {}: {} выброшена ошибка: {}",
