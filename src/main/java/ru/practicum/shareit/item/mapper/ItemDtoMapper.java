@@ -6,6 +6,7 @@ import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.item.dto.ItemShortResponseDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import java.util.List;
@@ -32,6 +33,7 @@ public class ItemDtoMapper {
     ) {
         ItemResponseDto mappedItemResponseDto = new ItemResponseDto(
                 item.getId(),
+                item.getRequestId(),
                 item.getName(),
                 item.getDescription(),
                 item.isAvailable(),
@@ -47,6 +49,7 @@ public class ItemDtoMapper {
     public Item mapDtoToItem(ItemDto itemDto, User owner) {
         Item mappedItem = new Item(
                 itemDto.getId(),
+                itemDto.getRequestId(),
                 owner,
                 itemDto.getName(),
                 itemDto.getDescription(),
@@ -54,6 +57,19 @@ public class ItemDtoMapper {
         );
         log.trace(OBJECT_MAPPED_MESSAGE, itemDto, mappedItem);
         return mappedItem;
+    }
+
+    public ItemShortResponseDto mapItemToShortResponseDto(Item item) {
+        ItemShortResponseDto mappedShortResponseDto = new ItemShortResponseDto(
+                item.getId(),
+                item.getRequestId(),
+                item.getName(),
+                item.getDescription(),
+                item.isAvailable(),
+                item.getOwner().getId()
+        );
+        log.trace(OBJECT_MAPPED_MESSAGE, item, mappedShortResponseDto);
+        return mappedShortResponseDto;
     }
 
 }

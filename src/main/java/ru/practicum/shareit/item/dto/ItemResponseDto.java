@@ -14,6 +14,8 @@ public class ItemResponseDto {
 
     private long id;
 
+    private Long requestId;
+
     private String name;
 
     private String description;
