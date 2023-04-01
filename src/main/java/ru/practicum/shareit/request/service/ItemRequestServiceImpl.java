@@ -11,6 +11,7 @@ import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.request.mapper.ItemRequestDtoMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
+import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import java.util.List;
@@ -29,7 +30,7 @@ public class ItemRequestServiceImpl implements ItemRequestService{
     @Transactional
     public ItemRequestResponseDto create(Long userId, ItemRequestDto itemRequestDto) {
         log.debug("Пользователь с ID = {} создал запрос на предмет {}", userId, itemRequestDto);
-        User user = userRepository.getReferenceById(userId);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         ItemRequest savedRequest =
                 itemRequestRepository.save(itemRequestDtoMapper.mapDtoToItemRequest(user, itemRequestDto));
@@ -41,10 +42,11 @@ public class ItemRequestServiceImpl implements ItemRequestService{
     @Transactional(readOnly = true)
     public ItemRequestResponseDto read(Long userId, Long itemRequestId) {
         log.debug("Пользователь с ID = {} запросил данные о запросе на предмет {}", userId, itemRequestId);
-        checkIfRequestExist(itemRequestId);
         checkIfUserExist(userId);
 
-        ItemRequest savedRequest = itemRequestRepository.getReferenceById(itemRequestId);
+        ItemRequest savedRequest = itemRequestRepository
+                .findById(itemRequestId)
+                .orElseThrow(ItemRequestNotFoundException::new);
         log.trace("Получен запрос: {}", savedRequest);
         return itemRequestDtoMapper.mapItemRequestToResponseDto(savedRequest);
     }
@@ -55,7 +57,9 @@ public class ItemRequestServiceImpl implements ItemRequestService{
         log.debug("Пользователь с ID = {} запросил список своих запросов на предметы", userId);
         checkIfUserExist(userId);
 
-        List<ItemRequest> foundRequests = itemRequestRepository.findAllByUserIdOrderByCreatedDesc(userId);
+        List<ItemRequest> foundRequests = itemRequestRepository
+                .findAllByUserIdOrderByCreatedDesc(userId)
+                .orElseThrow(ItemRequestNotFoundException::new);
         log.trace("Получен список запросов: {}", foundRequests);
         return foundRequests.stream()
                 .map(itemRequestDtoMapper::mapItemRequestToResponseDto)
@@ -70,8 +74,9 @@ public class ItemRequestServiceImpl implements ItemRequestService{
         );
         checkIfUserExist(userId);
 
-        List<ItemRequest> foundRequests =
-                itemRequestRepository.findAllByUserIdNotOrderByCreatedDesc(userId, PageRequest.of(from, size));
+        List<ItemRequest> foundRequests = itemRequestRepository
+                .findAllByUserIdNotOrderByCreatedDesc(userId, PageRequest.of(from, size))
+                .orElseThrow(ItemRequestNotFoundException::new);
         log.trace("Получен список запросов: {}", foundRequests);
 
         return foundRequests.stream()
@@ -79,17 +84,9 @@ public class ItemRequestServiceImpl implements ItemRequestService{
                 .collect(Collectors.toList());
     }
 
-    private void checkIfRequestExist(Long itemRequestId) {
-        if (!itemRequestRepository.existsById(itemRequestId)) {
-            log.warn("Запрос с ID = {} не существует", itemRequestId);
-            throw new ItemRequestNotFoundException("Запрос не существует");
-        }
-    }
-
     private void checkIfUserExist(Long userId) {
         if (!userRepository.existsById(userId)) {
-            log.warn("Пользователь с ID = {} не существует", userId);
-            throw new ItemRequestNotFoundException("Пользователь не существует");
+            throw new UserNotFoundException();
         }
     }
 
