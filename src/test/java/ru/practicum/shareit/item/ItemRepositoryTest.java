@@ -39,9 +39,9 @@ public class ItemRepositoryTest {
     void setUp() {
         user = new User(1L, "User#1--", "user@server.com");
         user2 = new User(2L, "User#2", "user2@server.com");
-        item = new Item(1L, user, "Item#1", "Item#1_OfUser#1", true);
-        item2 = new Item(2L, user, "Item#2", "Item#2_OfUser#1", false);
-        item3 = new Item(3L, user2, "Item#3", "Item#3_OfUser#2", true);
+        item = new Item(1L, null, user, "Item#1", "Item#1_OfUser#1", true);
+        item2 = new Item(2L, null, user, "Item#2", "Item#2_OfUser#1", false);
+        item3 = new Item(3L, null, user2, "Item#3", "Item#3_OfUser#2", true);
         userRepository.saveAllAndFlush(List.of(user, user2));
         itemRepository.saveAllAndFlush(List.of(item, item2, item3));
     }

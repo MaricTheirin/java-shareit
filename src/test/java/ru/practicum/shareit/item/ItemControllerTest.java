@@ -48,9 +48,11 @@ public class ItemControllerTest {
 
     @BeforeEach
     public void setUp() {
-        dto = new ItemDto(0, "Item#1", "Item#1_Desc", true);
+        dto = new ItemDto(0, null, "Item#1", "Item#1_Desc", true);
         responseDto = new ItemResponseDto(
-                1, dto.getName(),
+                1,
+                null,
+                dto.getName(),
                 dto.getDescription(),
                 dto.getAvailable(),
                 null,

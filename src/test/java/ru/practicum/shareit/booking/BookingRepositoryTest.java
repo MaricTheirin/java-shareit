@@ -34,7 +34,7 @@ public class BookingRepositoryTest {
 
     private final LocalDateTime now = LocalDateTime.now().withNano(0);
     private final User user = new User(1L, "User#1", "user@server.com");
-    private final Item item = new Item(1L, user, "Item#1", "Item#1_desc", true);
+    private final Item item = new Item(1L, null, user, "Item#1", "Item#1_desc", true);
     private final Booking itemLastBooking =
             new Booking(0, item, user, now.minusDays(2), now.minusDays(1), BookingStatus.APPROVED);
     private final Booking itemNextBooking =

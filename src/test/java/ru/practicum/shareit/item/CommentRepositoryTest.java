@@ -41,8 +41,8 @@ public class CommentRepositoryTest {
     @BeforeAll
     void setUp() {
         user = new User(1L, "User#1", "user@server.com");
-        item = new Item(1L, user, "Item#1", "Item#1_OfUser#1", true);
-        item2 = new Item(2L, user, "Item#2", "Item#2_OfUser#1", true);
+        item = new Item(1L, null, user, "Item#1", "Item#1_OfUser#1", true);
+        item2 = new Item(2L, null, user, "Item#2", "Item#2_OfUser#1", true);
         comment = new Comment(1L, "Comment#1", item, user, null);
         comment2 = new Comment(2L, "Comment#2", item2, user, null);
 
