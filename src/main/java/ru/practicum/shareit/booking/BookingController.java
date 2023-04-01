@@ -41,20 +41,24 @@ public class BookingController {
         return bookingService.read(userId, bookingId);
     }
 
-    @GetMapping()
+    @GetMapping
     protected List<BookingResponseDto> getOwnBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "ALL") String state
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(name = "from", defaultValue = "0") long from,
+            @RequestParam(name = "size", defaultValue = "20") long size
     ) {
-        return bookingService.findOwnBookings(userId, state);
+        return bookingService.findOwnBookings(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     protected List<BookingResponseDto> findOwnItemsBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "ALL") String state
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(name = "from", defaultValue = "0") long from,
+            @RequestParam(name = "size", defaultValue = "20") long size
     ) {
-        return bookingService.findOwnItemsBookings(userId, state);
+        return bookingService.findOwnItemsBookings(userId, state, from, size);
     }
 
 

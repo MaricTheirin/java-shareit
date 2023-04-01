@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface BookingRepositoryCustom {
 
-    List<Booking> findAllByUserItemsAndFilterByState(Long userId, BookingState state);
+    List<Booking> findAllByUserItemsAndFilterByState(Long userId, BookingState state, long from, long size);
 
-    List<Booking> findAllByUserBookingsAndFilterByStateOrderByIdAsc(Long userId, BookingState state);
+    List<Booking> findAllByUserBookingsAndFilterByStateOrderByIdAsc(Long userId, BookingState state, long from, long size);
 
 }

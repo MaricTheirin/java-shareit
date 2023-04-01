@@ -79,25 +79,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingResponseDto> findOwnBookings(Long userId, String state) {
-        log.debug("Пользователь с id = {} запросил информацию о всех своих арендах в состоянии {}", userId, state);
+    public List<BookingResponseDto> findOwnBookings(Long userId, String state, long from, long size) {
+        log.debug(
+                "Пользователь с id = {} запросил информацию о всех своих арендах в состоянии {} с лимитами [{}, {}]",
+                userId, state, from, size
+        );
         checkIfUserExists(userId);
+        checkPagingParameters(from, size);
         BookingState bookingState = findStateForUserString(state);
 
-        List<Booking> foundBookings = bookingRepository.findAllByUserBookingsAndFilterByStateOrderByIdAsc(userId, bookingState);
+        List<Booking> foundBookings =
+                bookingRepository.findAllByUserBookingsAndFilterByStateOrderByIdAsc(userId, bookingState, from, size);
         log.trace("Полученный результат: {}", foundBookings);
         return foundBookings.stream().map(bookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingResponseDto> findOwnItemsBookings(Long userId, String state) {
-        log.debug("Пользователь с id = {} запросил информацию об арендах своих вещей в состоянии {}", userId, state);
+    public List<BookingResponseDto> findOwnItemsBookings(Long userId, String state, long from, long size) {
+        log.debug(
+                "Пользователь с id = {} запросил информацию об арендах своих вещей в состоянии {} с лимитами [{}, {}]",
+                userId, state, from, size
+        );
         BookingState bookingState = findStateForUserString(state);
-
         checkIfUserExists(userId);
+        checkPagingParameters(from, size);
 
-        List<Booking> foundBookings = bookingRepository.findAllByUserItemsAndFilterByState(userId, bookingState);
+        List<Booking> foundBookings = bookingRepository.findAllByUserItemsAndFilterByState(userId, bookingState, from, size);
         log.trace("Полученный результат: {}", foundBookings);
         return foundBookings.stream().map(bookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
     }
@@ -169,6 +177,15 @@ public class BookingServiceImpl implements BookingService {
             return BookingState.valueOf(stringState.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BookingUnsupportedStateException("Unknown state: " + stringState);
+        }
+    }
+
+    private void checkPagingParameters(long page, long size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("Page size must not be less than one");
+        }
+        if (page < 0) {
+            throw new IllegalArgumentException("Page number must not be less than zero");
         }
     }
 
