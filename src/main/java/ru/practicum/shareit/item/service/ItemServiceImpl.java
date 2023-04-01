@@ -38,9 +38,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemResponseDto create(Long userId, ItemDto itemDto) {
         log.debug("Для пользователя с id = {} добавляется новый объект: {}", userId, itemDto);
-        checkBeforeSave(userId, itemDto);
 
-        User user = userRepository.getReferenceById(userId);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Item savedItem = itemRepository.saveAndFlush(itemDtoMapper.mapDtoToItem(itemDto, user));
         log.trace("Сохранённый предмет: {}", savedItem);
         return itemDtoMapper.mapItemToResponseDto(savedItem);
@@ -50,9 +49,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public ItemResponseDto read(Long userId, Long itemId) {
         log.debug("Пользователь с id = {} запросил объект с id = {}", userId, itemId);
-        checkIfItemExist(itemId);
 
-        Item resultItem = itemRepository.getReferenceById(itemId);
+        Item resultItem = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
         log.trace("Найден объект {}", resultItem);
 
         return mapItemToResponseDto(resultItem, userId);
@@ -62,9 +60,9 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemResponseDto update(Long userId, Long itemId, ItemDto itemDto) {
         log.debug("Запрошено обновление объекта с id = {} ({}) для пользователя с id = {}", itemId, itemDto, userId);
-        checkBeforeUpdate(userId, itemId);
 
-        Item savedItem = itemRepository.getReferenceById(itemId);
+        Item savedItem =
+                itemRepository.getItemByIdEqualsAndOwnerIdEquals(itemId, userId).orElseThrow(ItemNotFoundException::new);
         updateItemFields(userId, savedItem, itemDto);
         log.trace("Сохранённый предмет: {}", savedItem);
         return mapItemToResponseDto(savedItem, userId);
@@ -75,9 +73,9 @@ public class ItemServiceImpl implements ItemService {
     public ItemResponseDto delete(Long userId, Long itemId) {
         log.debug("Для пользователя с id = {} удаляется предмет с id = {}", userId, itemId);
 
-        checkIfUserExist(userId);
-        checkIfItemExistAndBelongsToUser(userId, itemId);
-        Item itemToDelete = itemRepository.getReferenceById(itemId);
+        Item itemToDelete = itemRepository
+                .getItemByIdEqualsAndOwnerIdEquals(itemId, userId)
+                .orElseThrow(ItemNotFoundException::new);
         itemRepository.delete(itemToDelete);
         log.trace("Выполнено удаление предмета: {}", itemToDelete);
         return mapItemToResponseDto(itemToDelete, userId);
@@ -93,7 +91,6 @@ public class ItemServiceImpl implements ItemService {
 
         List<Item> foundItems = itemRepository.findAllAvailableAndContainingQueryIgnoreCase(searchQuery);
         log.trace("Найденные вещи: {}", foundItems);
-
         return foundItems.stream().map(item -> mapItemToResponseDto(item, 0)).collect(Collectors.toList());
     }
 
@@ -101,9 +98,9 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public List<ItemResponseDto> findAll(Long userId) {
         log.debug("Для пользователя с id = {} запрошен список всех предметов", userId);
-        checkIfUserExist(userId);
 
-        List<Item> allUserItems = itemRepository.findAllByOwnerIdOrderByIdAsc(userId);
+        List<Item> allUserItems =
+                itemRepository.findAllByOwnerIdOrderByIdAsc(userId).orElseThrow(ItemNotFoundException::new);
         log.trace("Получен массив предметов: {}", allUserItems);
         return new ArrayList<>(mapItemsToResponseDto(allUserItems).values());
 
@@ -116,8 +113,8 @@ public class ItemServiceImpl implements ItemService {
                 "Пользователь с id = {} запросил добавление к предмету с id = {} комментария {}",
                 userId, itemId, commentDto
         );
-        checkBeforeCommentSave(userId, itemId);
-        Item item = itemRepository.getReferenceById(itemId);
+        checkIfItemWasBookedByUser(userId, itemId);
+        Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
         User commentAuthor = userRepository.getReferenceById(userId);
 
         Comment savedComment = commentRepository.saveAndFlush(
@@ -127,45 +124,11 @@ public class ItemServiceImpl implements ItemService {
         return commentDtoMapper.mapCommentToResponseDto(savedComment);
     }
 
-    private void checkBeforeCommentSave(Long userId, Long itemId) {
-        checkIfUserExist(userId);
-        checkIfItemExist(itemId);
+    private void checkIfItemWasBookedByUser(Long userId, Long itemId) {
         if (!bookingRepository.existsBookingByItemIdAndBookerIdAndStatusAndEndIsBefore(
                 itemId, userId, BookingStatus.APPROVED, LocalDateTime.now())
         ) {
             throw new ItemNotAvailableException("Оставить комментарий можно только успешной аренды");
-        }
-    }
-
-    private void checkBeforeSave(Long userId, ItemDto itemDto) {
-        checkIfUserExist(userId);
-    }
-
-    private void checkBeforeUpdate(Long userId, Long itemId) {
-        checkIfUserExist(userId);
-        checkIfItemExistAndBelongsToUser(userId, itemId);
-    }
-
-    private void checkIfUserExist(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            log.warn("Владелец с id = {} не существует", userId);
-            throw new UserNotFoundException("Ошибка при сохранении вещи - владелец не обнаружен");
-        }
-    }
-
-    private void checkIfItemExist(Long itemId) {
-        if (!itemRepository.existsById(itemId)) {
-            log.warn("Предмет с id = {} не существует", itemId);
-            throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не был добавлен ранее");
-        }
-    }
-
-    private void checkIfItemExistAndBelongsToUser(Long userId, Long itemId) {
-        checkIfItemExist(itemId);
-        Item item = itemRepository.getReferenceById(itemId);
-        if (item.getOwner().getId() != userId) {
-            log.warn("Предмет с id = {} не принадлежит пользователю с id = {}", itemId, userId);
-            throw new ItemNotFoundException("Ошибка при обновлении вещи - объект не принадлежит пользователю");
         }
     }
 
