@@ -84,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
         checkIfUserExists(userId);
         BookingState bookingState = findStateForUserString(state);
 
-        List<Booking> foundBookings = bookingRepository.findAllByUserBookingsAndFilterByState(userId, bookingState);
+        List<Booking> foundBookings = bookingRepository.findAllByUserBookingsAndFilterByStateOrderByIdAsc(userId, bookingState);
         log.trace("Полученный результат: {}", foundBookings);
         return foundBookings.stream().map(bookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
     }

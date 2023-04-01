@@ -29,7 +29,7 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
     }
 
     @Override
-    public List<Booking> findAllByUserBookingsAndFilterByState(Long userId, BookingState state) {
+    public List<Booking> findAllByUserBookingsAndFilterByStateOrderByIdAsc(Long userId, BookingState state) {
         return findBookingsByUserAndState(userId, state, SearchBy.USER_BOOKINGS);
     }
 

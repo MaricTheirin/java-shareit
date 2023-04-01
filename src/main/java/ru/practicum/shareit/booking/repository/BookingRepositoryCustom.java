@@ -8,6 +8,6 @@ public interface BookingRepositoryCustom {
 
     List<Booking> findAllByUserItemsAndFilterByState(Long userId, BookingState state);
 
-    List<Booking> findAllByUserBookingsAndFilterByState(Long userId, BookingState state);
+    List<Booking> findAllByUserBookingsAndFilterByStateOrderByIdAsc(Long userId, BookingState state);
 
 }
