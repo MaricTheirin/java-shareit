@@ -6,13 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.item.model.Item;
 import java.util.List;
+import java.util.Optional;
 
 @Validated
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Item getItemByIdEqualsAndOwnerIdEquals(Long id, Long ownerId);
+    Optional<Item> getItemByIdEqualsAndOwnerIdEquals(Long id, Long ownerId);
 
-    List<Item> findAllByOwnerIdOrderByIdAsc(Long ownerId);
+    Optional<List<Item>> findAllByOwnerIdOrderByIdAsc(Long ownerId);
 
     @Query("SELECT new ru.practicum.shareit.item.model.Item(it.id, it.requestId, u, it.name, it.description, it.available) " +
             "FROM Item AS it " +
