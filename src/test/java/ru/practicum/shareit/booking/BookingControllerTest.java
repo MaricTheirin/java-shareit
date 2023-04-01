@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(controllers = BookingController.class)
+@RequiredArgsConstructor
 public class BookingControllerTest {
 
     @MockBean
@@ -51,6 +53,7 @@ public class BookingControllerTest {
                 new CommentResponseDto(1L, "Comment#1", 1L, "Author#1", LocalDateTime.now().withNano(0));
         itemDto = new ItemResponseDto(
                 1L,
+                null,
                 "Item#1",
                 "Item#1_Description",
                 true,
