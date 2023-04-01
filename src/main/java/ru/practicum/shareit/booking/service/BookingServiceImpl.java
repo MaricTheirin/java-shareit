@@ -107,8 +107,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkBeforeGet(Long userId, Booking booking) {
-        checkIfUserExists(userId);
-
         Item item = booking.getItem();
         if (!userId.equals(booking.getBooker().getId()) && !userId.equals(item.getOwner().getId())) {
             log.warn("Пользователь {} не имеет доступа к просмотру бронирования {}", userId, booking);
@@ -149,22 +147,8 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void checkIfBookingExists(Long bookingId) {
-        if (!bookingRepository.existsById(bookingId)) {
-            throw new BookingNotFoundException("Запрошенная бронь не существует");
-        }
-    }
-
     private boolean checkIfItemIsOwnedByUser(long itemId, long userId) {
         return itemRepository.existsItemByIdAndOwnerId(itemId, userId);
-    }
-
-    private BookingState findStateForUserString(String stringState) {
-        try {
-            return BookingState.valueOf(stringState.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new BookingUnsupportedStateException("Unknown state: " + stringState);
-        }
     }
 
     private void checkPagingParameters(long page, long size) {
