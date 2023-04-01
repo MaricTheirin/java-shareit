@@ -32,14 +32,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ItemControllerTest {
 
-    @Autowired
     private final ObjectMapper objectMapper;
-
-    @Autowired
     private final MockMvc mockMvc;
 
     @MockBean
-    ItemService itemService;
+    private ItemService itemService;
 
     private ItemDto dto;
     private ItemResponseDto responseDto;
@@ -47,7 +44,7 @@ public class ItemControllerTest {
     private CommentResponseDto commentResponseDto;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         dto = new ItemDto(0, null, "Item#1", "Item#1_Desc", true);
         responseDto = new ItemResponseDto(
                 1,

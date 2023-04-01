@@ -23,10 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserControllerTest {
 
-    @Autowired
     private final ObjectMapper objectMapper;
-
-    @Autowired
     private final MockMvc mockMvc;
 
     @MockBean

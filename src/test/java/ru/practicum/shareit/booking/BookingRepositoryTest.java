@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -20,17 +21,12 @@ import java.util.Set;
 @DataJpaTest
 @TestInstance(value = TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingRepositoryTest {
 
-
-    @Autowired
-    private BookingRepository bookingRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     private final LocalDateTime now = LocalDateTime.now().withNano(0);
     private final User user = new User(1L, "User#1", "user@server.com");

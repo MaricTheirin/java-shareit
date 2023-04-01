@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -25,20 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 @TestInstance(value = TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingRepositoryImplTest {
 
-    @Autowired
-    private BookingRepository bookingRepository;
-
-    @Autowired
-    private BookingRepositoryImpl bookingRepositoryImpl;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ItemRepository itemRepository;
-
+    private final BookingRepository bookingRepository;
+    private final BookingRepositoryImpl bookingRepositoryImpl;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     private final LocalDateTime now = LocalDateTime.now().withNano(0);
     private final User user = new User(1L, "User#1", "user@server.com");
@@ -63,10 +57,10 @@ public class BookingRepositoryImplTest {
     @Test
     void findAllByUserBookingsAndFilterByState() {
         List<Booking> user1Bookings =
-                bookingRepositoryImpl.findAllByUserBookingsAndFilterByStateOrderByIdAsc(user.getId(), BookingState.PAST);
+                bookingRepositoryImpl.findAllByUserBookingsAndFilterByStateOrderByIdAsc(user.getId(), BookingState.PAST, 0, 99);
 
         List<Booking> user2Bookings =
-                bookingRepositoryImpl.findAllByUserBookingsAndFilterByStateOrderByIdAsc(user2.getId(), BookingState.PAST);
+                bookingRepositoryImpl.findAllByUserBookingsAndFilterByStateOrderByIdAsc(user2.getId(), BookingState.PAST, 0, 99);
 
         assertEquals(0, user1Bookings.size());
         assertEquals(1, user2Bookings.size());
@@ -81,10 +75,10 @@ public class BookingRepositoryImplTest {
     @Test
     void findAllByUserItemsAndFilterByStateTest() {
         List<Booking> user1ItemsBookings =
-                bookingRepositoryImpl.findAllByUserItemsAndFilterByState(user.getId(), BookingState.PAST);
+                bookingRepositoryImpl.findAllByUserItemsAndFilterByState(user.getId(), BookingState.PAST, 0, 99);
 
         List<Booking> user2ItemsBookings =
-                bookingRepositoryImpl.findAllByUserItemsAndFilterByState(user2.getId(), BookingState.PAST);
+                bookingRepositoryImpl.findAllByUserItemsAndFilterByState(user2.getId(), BookingState.PAST, 0, 99);
 
         assertEquals(0, user2ItemsBookings.size());
         assertEquals(1, user1ItemsBookings.size());

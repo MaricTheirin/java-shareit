@@ -27,23 +27,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(controllers = BookingController.class)
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingControllerTest {
 
     @MockBean
     BookingController bookingController;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+    private final MockMvc mockMvc;
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    BookingDto dto;
-    BookingResponseDto responseDto;
-    UserResponseDto userDto;
-    CommentResponseDto commentDto;
-    ItemResponseDto itemDto;
+    private BookingDto dto;
+    private BookingResponseDto responseDto;
+    private UserResponseDto userDto;
+    private CommentResponseDto commentDto;
+    private ItemResponseDto itemDto;
 
 
     @BeforeEach
@@ -186,8 +183,9 @@ public class BookingControllerTest {
     @Test
     void getOwnBookingsTest() throws Exception{
         Mockito
-                .when(bookingController.getOwnBookings(Mockito.anyLong(), Mockito.anyString()))
-                .thenReturn(List.of(responseDto));
+                .when(bookingController.getOwnBookings(
+                        Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong(), Mockito.anyLong())
+                ).thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/bookings", 1L)
                         .header("X-Sharer-User-Id", "1")
@@ -225,8 +223,9 @@ public class BookingControllerTest {
     @Test
     void findOwnItemsBookingsTest() throws Exception{
         Mockito
-                .when(bookingController.findOwnItemsBookings(Mockito.anyLong(), Mockito.anyString()))
-                .thenReturn(List.of(responseDto));
+                .when(bookingController.findOwnItemsBookings(
+                        Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong(), Mockito.anyLong())
+                ).thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/bookings/owner", 1L)
                         .header("X-Sharer-User-Id", "1")

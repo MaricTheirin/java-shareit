@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -21,16 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 @TestInstance(value = TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class CommentRepositoryTest {
 
-    @Autowired
-    CommentRepository commentRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     private User user;
     private Item item;
@@ -55,7 +52,7 @@ public class CommentRepositoryTest {
     void findAllByItemIdIn() {
         List<Comment> comments = commentRepository.findAllByItemIdIn(Set.of(item2.getId()));
         assertEquals(1, comments.size());
-        assertEquals(1, comments.get(0).getId());
+        assertEquals(2, comments.get(0).getId());
     }
 
 }

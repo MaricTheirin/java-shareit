@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,13 +21,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @TestInstance(value = TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ItemRepositoryTest {
 
-    @Autowired
-    ItemRepository itemRepository;
-
-    @Autowired
-    UserRepository userRepository;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
 
     private final LocalDateTime now = LocalDateTime.now().withNano(0);
     private User user;
