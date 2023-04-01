@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.repository.ItemRepository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
@@ -23,10 +23,10 @@ public class ItemRequestServiceImpl implements ItemRequestService{
 
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
     private final ItemRequestDtoMapper itemRequestDtoMapper;
 
     @Override
+    @Transactional
     public ItemRequestResponseDto create(Long userId, ItemRequestDto itemRequestDto) {
         log.debug("Пользователь с ID = {} создал запрос на предмет {}", userId, itemRequestDto);
         User user = userRepository.getReferenceById(userId);
@@ -38,6 +38,7 @@ public class ItemRequestServiceImpl implements ItemRequestService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemRequestResponseDto read(Long userId, Long itemRequestId) {
         log.debug("Пользователь с ID = {} запросил данные о запросе на предмет {}", userId, itemRequestId);
         checkIfRequestExist(itemRequestId);
@@ -49,6 +50,7 @@ public class ItemRequestServiceImpl implements ItemRequestService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequestResponseDto> readUserRequests(Long userId) {
         log.debug("Пользователь с ID = {} запросил список своих запросов на предметы", userId);
         checkIfUserExist(userId);
@@ -61,6 +63,7 @@ public class ItemRequestServiceImpl implements ItemRequestService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequestResponseDto> readAllUsersRequests(Long userId, int from, int size) {
         log.debug("Пользователь с ID = {} запросил список всех запросов на предметыс разбивкой [{},{}]",
                 userId, from, size
