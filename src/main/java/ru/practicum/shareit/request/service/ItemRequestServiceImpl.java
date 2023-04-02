@@ -24,7 +24,6 @@ public class ItemRequestServiceImpl implements ItemRequestService{
 
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
-    private final ItemRequestDtoMapper itemRequestDtoMapper;
 
     @Override
     @Transactional
@@ -33,9 +32,9 @@ public class ItemRequestServiceImpl implements ItemRequestService{
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         ItemRequest savedRequest =
-                itemRequestRepository.save(itemRequestDtoMapper.mapDtoToItemRequest(user, itemRequestDto));
+                itemRequestRepository.save(ItemRequestDtoMapper.mapDtoToItemRequest(user, itemRequestDto));
         log.trace("Запрос сохранён: {}", savedRequest);
-        return itemRequestDtoMapper.mapItemRequestToResponseDto(savedRequest);
+        return ItemRequestDtoMapper.mapItemRequestToResponseDto(savedRequest);
     }
 
     @Override
@@ -48,7 +47,7 @@ public class ItemRequestServiceImpl implements ItemRequestService{
                 .findById(itemRequestId)
                 .orElseThrow(ItemRequestNotFoundException::new);
         log.trace("Получен запрос: {}", savedRequest);
-        return itemRequestDtoMapper.mapItemRequestToResponseDto(savedRequest);
+        return ItemRequestDtoMapper.mapItemRequestToResponseDto(savedRequest);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class ItemRequestServiceImpl implements ItemRequestService{
                 .orElseThrow(ItemRequestNotFoundException::new);
         log.trace("Получен список запросов: {}", foundRequests);
         return foundRequests.stream()
-                .map(itemRequestDtoMapper::mapItemRequestToResponseDto)
+                .map(ItemRequestDtoMapper::mapItemRequestToResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -80,7 +79,7 @@ public class ItemRequestServiceImpl implements ItemRequestService{
         log.trace("Получен список запросов: {}", foundRequests);
 
         return foundRequests.stream()
-                .map(itemRequestDtoMapper::mapItemRequestToResponseDto)
+                .map(ItemRequestDtoMapper::mapItemRequestToResponseDto)
                 .collect(Collectors.toList());
     }
 

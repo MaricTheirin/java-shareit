@@ -15,7 +15,7 @@ public class CommentDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
 
-    public Comment mapDtoToComment(CommentDto commentDto, User author, Item item) {
+    public static Comment mapDtoToComment(CommentDto commentDto, User author, Item item) {
         Comment mappedComment = new Comment(
                 commentDto.getId(),
                 commentDto.getText(),
@@ -27,7 +27,7 @@ public class CommentDtoMapper {
         return mappedComment;
     }
 
-    public CommentResponseDto mapCommentToResponseDto(Comment comment) {
+    public static CommentResponseDto mapCommentToResponseDto(Comment comment) {
         CommentResponseDto mappedResponseDto = new CommentResponseDto(
                 comment.getId(),
                 comment.getText(),

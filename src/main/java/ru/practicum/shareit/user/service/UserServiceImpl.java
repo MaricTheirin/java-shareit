@@ -19,16 +19,15 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserDtoMapper userDtoMapper;
 
     @Override
     @Transactional
     public UserResponseDto create(UserDto userDto) {
         log.debug("Запрошено сохранение пользователя: {}", userDto);
 
-        User savedUser = userRepository.save(userDtoMapper.mapDtoToUser(userDto));
+        User savedUser = userRepository.save(UserDtoMapper.mapDtoToUser(userDto));
         log.trace("Сохранённый пользователь: {}", savedUser);
-        return userDtoMapper.mapUserToResponseDto(savedUser);
+        return UserDtoMapper.mapUserToResponseDto(savedUser);
     }
 
     @Override
@@ -38,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
         User requestedUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         log.trace("Найден пользователь: {}", requestedUser);
-        return userDtoMapper.mapUserToResponseDto(requestedUser);
+        return UserDtoMapper.mapUserToResponseDto(requestedUser);
     }
 
     @Override
@@ -49,7 +48,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         updateUserFields(savedUser, userDto);
         log.trace("Пользователь обновлён. Сохранённое значение: {}", savedUser);
-        return userDtoMapper.mapUserToResponseDto(savedUser);
+        return UserDtoMapper.mapUserToResponseDto(savedUser);
     }
 
     @Override
@@ -60,7 +59,7 @@ public class UserServiceImpl implements UserService {
         User requestedUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         userRepository.delete(requestedUser);
         log.trace("Удалён пользователь: {}", requestedUser);
-        return userDtoMapper.mapUserToResponseDto(requestedUser);
+        return UserDtoMapper.mapUserToResponseDto(requestedUser);
     }
 
     @Override
@@ -68,7 +67,7 @@ public class UserServiceImpl implements UserService {
     public List<UserResponseDto> findAll() {
         log.debug("Запрошен список всех пользователей");
         List<UserResponseDto> users =
-                userRepository.findAll().stream().map(userDtoMapper::mapUserToResponseDto).collect(Collectors.toList());
+                userRepository.findAll().stream().map(UserDtoMapper::mapUserToResponseDto).collect(Collectors.toList());
         log.trace("Полученное значение: {}", users);
         return users;
     }

@@ -20,23 +20,21 @@ import ru.practicum.shareit.user.model.User;
 public class BookingDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
-    private final UserDtoMapper userDtoMapper;
-    private final ItemDtoMapper itemDtoMapper;
 
-    public BookingResponseDto mapBookingToResultDto(Booking booking) {
+    public static BookingResponseDto mapBookingToResultDto(Booking booking) {
         BookingResponseDto resultDto = new BookingResponseDto(
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getStatus(),
-                userDtoMapper.mapUserToResponseDto(booking.getBooker()),
-                itemDtoMapper.mapItemToResponseDto(booking.getItem())
+                UserDtoMapper.mapUserToResponseDto(booking.getBooker()),
+                ItemDtoMapper.mapItemToResponseDto(booking.getItem())
         );
         log.trace(OBJECT_MAPPED_MESSAGE, booking, resultDto);
         return resultDto;
     }
 
-    public Booking mapDtoToBooking(BookingDto bookingDto, Item item, User booker) {
+    public static Booking mapDtoToBooking(BookingDto bookingDto, Item item, User booker) {
         Booking mappedBooking = new Booking(
                 bookingDto.getId(),
                 item,
@@ -49,7 +47,7 @@ public class BookingDtoMapper {
         return mappedBooking;
     }
 
-    public BookingShortResponseDto mapBookingShortToDto(BookingShort bookingShort) {
+    public static BookingShortResponseDto mapBookingShortToDto(BookingShort bookingShort) {
         BookingShortResponseDto shortResponseDto =  new BookingShortResponseDto(
                 bookingShort.getId(), bookingShort.getBooker().getId(), bookingShort.getStart(), bookingShort.getEnd()
         );

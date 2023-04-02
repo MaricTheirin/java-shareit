@@ -38,10 +38,10 @@ public class BookingServiceImpl implements BookingService {
         User booker = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         Booking savedBooking = bookingRepository.saveAndFlush(
-                bookingDtoMapper.mapDtoToBooking(bookingDto, item, booker)
+                BookingDtoMapper.mapDtoToBooking(bookingDto, item, booker)
         );
         log.trace("Сохранённый предмет: {}", savedBooking);
-        return bookingDtoMapper.mapBookingToResultDto(savedBooking);
+        return BookingDtoMapper.mapBookingToResultDto(savedBooking);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(BookingNotFoundException::new);
         log.trace("По bookingId = {} получен {}", bookingId, booking);
         checkBeforeGet(userId, booking);
-        return bookingDtoMapper.mapBookingToResultDto(booking);
+        return BookingDtoMapper.mapBookingToResultDto(booking);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class BookingServiceImpl implements BookingService {
         checkBeforeReview(userId, booking);
 
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        return bookingDtoMapper.mapBookingToResultDto(booking);
+        return BookingDtoMapper.mapBookingToResultDto(booking);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> foundBookings =
                 bookingRepository.findAllByUserBookingsAndFilterByStateOrderByIdAsc(userId, bookingState, from, size);
         log.trace("Полученный результат: {}", foundBookings);
-        return foundBookings.stream().map(bookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
+        return foundBookings.stream().map(BookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
     }
 
     @Override
@@ -103,7 +103,7 @@ public class BookingServiceImpl implements BookingService {
 
         List<Booking> foundBookings = bookingRepository.findAllByUserItemsAndFilterByState(userId, bookingState, from, size);
         log.trace("Полученный результат: {}", foundBookings);
-        return foundBookings.stream().map(bookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
+        return foundBookings.stream().map(BookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
     }
 
     private void checkBeforeGet(Long userId, Booking booking) {

@@ -26,13 +26,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemDtoMapper itemDtoMapper;
-    private final CommentDtoMapper commentDtoMapper;
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
-    private final BookingDtoMapper bookingDtoMapper;
 
     @Override
     @Transactional
@@ -40,9 +37,9 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Для пользователя с id = {} добавляется новый объект: {}", userId, itemDto);
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Item savedItem = itemRepository.saveAndFlush(itemDtoMapper.mapDtoToItem(itemDto, user));
+        Item savedItem = itemRepository.saveAndFlush(ItemDtoMapper.mapDtoToItem(itemDto, user));
         log.trace("Сохранённый предмет: {}", savedItem);
-        return itemDtoMapper.mapItemToResponseDto(savedItem);
+        return ItemDtoMapper.mapItemToResponseDto(savedItem);
     }
 
     @Override
@@ -118,10 +115,10 @@ public class ItemServiceImpl implements ItemService {
         User commentAuthor = userRepository.getReferenceById(userId);
 
         Comment savedComment = commentRepository.saveAndFlush(
-                commentDtoMapper.mapDtoToComment(commentDto, commentAuthor, item)
+                CommentDtoMapper.mapDtoToComment(commentDto, commentAuthor, item)
         );
         log.trace("Результат сохранения комментария: {}", savedComment);
-        return commentDtoMapper.mapCommentToResponseDto(savedComment);
+        return CommentDtoMapper.mapCommentToResponseDto(savedComment);
     }
 
     private void checkIfItemWasBookedByUser(Long userId, Long itemId) {
@@ -169,7 +166,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private ItemResponseDto mapItemToResponseDto(Item item, long requestedUserId) {
-        ItemResponseDto responseDto = itemDtoMapper.mapItemToResponseDto(item);
+        ItemResponseDto responseDto = ItemDtoMapper.mapItemToResponseDto(item);
         if (requestedUserId == item.getOwner().getId()) {
             addLastAndNextBookingForItem(responseDto);
         }
@@ -180,7 +177,7 @@ public class ItemServiceImpl implements ItemService {
 
     private Map<Long, ItemResponseDto> mapItemsToResponseDto(List<Item> items) {
         Map<Long, ItemResponseDto> mappedItems =  items.stream()
-                .map(itemDtoMapper::mapItemToResponseDto)
+                .map(ItemDtoMapper::mapItemToResponseDto)
                 .collect(Collectors.toMap(ItemResponseDto::getId, Function.identity()));
 
         addLastAndNextBookingForItems(mappedItems);
@@ -211,10 +208,10 @@ public class ItemServiceImpl implements ItemService {
 
         items.values().forEach(item -> {
             if (lastBookings.containsKey(item.getId())) {
-                item.setLastBooking(bookingDtoMapper.mapBookingShortToDto(lastBookings.get(item.getId())));
+                item.setLastBooking(BookingDtoMapper.mapBookingShortToDto(lastBookings.get(item.getId())));
             }
             if (nextBookings.containsKey(item.getId())) {
-                item.setNextBooking(bookingDtoMapper.mapBookingShortToDto(nextBookings.get(item.getId())));
+                item.setNextBooking(BookingDtoMapper.mapBookingShortToDto(nextBookings.get(item.getId())));
             }
         });
 
@@ -224,7 +221,7 @@ public class ItemServiceImpl implements ItemService {
         Map<Long, List<CommentResponseDto>> comments = commentRepository
                 .findAllByItemIdIn(items.keySet())
                 .stream()
-                .map(commentDtoMapper::mapCommentToResponseDto)
+                .map(CommentDtoMapper::mapCommentToResponseDto)
                 .collect(Collectors.groupingBy(CommentResponseDto::getItemId, Collectors.toList()));
 
         items.values().forEach(item -> item.setComments(comments.getOrDefault(item.getId(), Collections.emptyList())));

@@ -17,15 +17,15 @@ public class ItemDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
 
-    public ItemResponseDto mapItemToResponseDto(Item item) {
+    public static ItemResponseDto mapItemToResponseDto(Item item) {
         return mapItemToResponseDto(item, null);
     }
 
-    public ItemResponseDto mapItemToResponseDto(Item item, List<CommentResponseDto> comments) {
+    public static ItemResponseDto mapItemToResponseDto(Item item, List<CommentResponseDto> comments) {
         return mapItemToResponseDto(item, null, null, comments);
     }
 
-    public ItemResponseDto mapItemToResponseDto(
+    public static ItemResponseDto mapItemToResponseDto(
             Item item,
             BookingShortResponseDto lastBooking,
             BookingShortResponseDto nextBooking,
@@ -46,7 +46,7 @@ public class ItemDtoMapper {
         return mappedItemResponseDto;
     }
 
-    public Item mapDtoToItem(ItemDto itemDto, User owner) {
+    public static Item mapDtoToItem(ItemDto itemDto, User owner) {
         Item mappedItem = new Item(
                 itemDto.getId(),
                 itemDto.getRequestId(),
@@ -59,7 +59,7 @@ public class ItemDtoMapper {
         return mappedItem;
     }
 
-    public ItemShortResponseDto mapItemToShortResponseDto(Item item) {
+    public static ItemShortResponseDto mapItemToShortResponseDto(Item item) {
         ItemShortResponseDto mappedShortResponseDto = new ItemShortResponseDto(
                 item.getId(),
                 item.getRequestId(),

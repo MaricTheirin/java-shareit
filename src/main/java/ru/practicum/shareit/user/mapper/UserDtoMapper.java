@@ -12,13 +12,13 @@ public class UserDtoMapper {
 
     private static final String DEFAULT_MESSAGE = "Выполнено преобразование объекта из {} в {}";
 
-    public User mapDtoToUser(UserDto userDto) {
+    public static User mapDtoToUser(UserDto userDto) {
         User user = new User(0, userDto.getName(), userDto.getEmail());
         log.trace(DEFAULT_MESSAGE, userDto, user);
         return user;
     }
 
-    public UserResponseDto mapUserToResponseDto(User user) {
+    public static UserResponseDto mapUserToResponseDto(User user) {
         UserResponseDto userResultDto = new UserResponseDto(user.getId(), user.getName(), user.getEmail());
         log.trace(DEFAULT_MESSAGE, user, userResultDto);
         return userResultDto;
