@@ -14,11 +14,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.user.dto.UserResponseDto;
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -184,7 +184,7 @@ public class BookingControllerTest {
     void getOwnBookingsTest() throws Exception{
         Mockito
                 .when(bookingController.getOwnBookings(
-                        Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong(), Mockito.anyLong())
+                        Mockito.anyLong(), Mockito.any(BookingState.class), Mockito.anyLong(), Mockito.anyLong())
                 ).thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/bookings", 1L)
@@ -224,7 +224,7 @@ public class BookingControllerTest {
     void findOwnItemsBookingsTest() throws Exception{
         Mockito
                 .when(bookingController.findOwnItemsBookings(
-                        Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong(), Mockito.anyLong())
+                        Mockito.anyLong(), Mockito.any(BookingState.class), Mockito.anyLong(), Mockito.anyLong())
                 ).thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/bookings/owner", 1L)

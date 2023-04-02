@@ -2,17 +2,16 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
+import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,7 +46,8 @@ public class ItemRepositoryTest {
 
     @Test
     void findAllByOwnerIdOrderByIdAscTest() {
-        List<Item> itemsFoundByOwner = itemRepository.findAllByOwnerIdOrderByIdAsc(user.getId());
+        List<Item> itemsFoundByOwner =
+                itemRepository.findAllByOwnerIdOrderByIdAsc(user.getId()).orElseThrow(ItemNotFoundException::new);
         assertEquals(2, itemsFoundByOwner.size(), "Пользователю должно принадлежать 2 предмета");
         assertEquals(1L, itemsFoundByOwner.get(0).getId(), "Массив предметов не отсортирован по ID");
     }
