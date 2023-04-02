@@ -157,6 +157,9 @@ public class BookingServiceImplTest {
         assertEquals(bookingResponseDto.getBooker().getId(), createdResponseDto.getBooker().getId());
         assertEquals(bookingResponseDto.getStart(), createdResponseDto.getStart());
         assertEquals(bookingResponseDto.getEnd(), createdResponseDto.getEnd());
+
+        Mockito.when(bookingRepository.findById(Long.MAX_VALUE)).thenReturn(Optional.empty());
+        assertThrows(BookingNotFoundException.class, () -> bookingService.review(user1.getId(), Long.MAX_VALUE, true));
     }
 
     @Test

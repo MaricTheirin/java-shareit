@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
+import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
+import ru.practicum.shareit.booking.model.BookingShort;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -14,6 +16,7 @@ import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.exception.ItemNotAvailableException;
+import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.mapper.CommentDtoMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -66,6 +69,14 @@ public class ItemServiceImplTest {
             false
     );
 
+    private final ItemDto itemDto1IncorrectId = new ItemDto(
+            99L,
+            null,
+            "Item#1_name_updated",
+            "Item#1_desc_updated",
+            false
+    );
+
     private final Item item1 = new Item(
             1L,
             null,
@@ -75,14 +86,26 @@ public class ItemServiceImplTest {
             true
     );
 
+    private final BookingShort lastBookingShort =
+            new BookingShort(1L, 1L, user1, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(1));
+
+    private final BookingShort nextBookingShort =
+            new BookingShort(2L, 1L, user1, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
+
+    private final BookingShortResponseDto lastBookingShortResponseDto =
+            BookingDtoMapper.mapBookingShortToDto(lastBookingShort);
+
+    private final BookingShortResponseDto nextBookingShortResponseDto =
+            BookingDtoMapper.mapBookingShortToDto(nextBookingShort);
+
     private final ItemResponseDto itemResponseDto1 = new ItemResponseDto(
             1L,
             null,
             "Item#1_name",
             "Item#1_desc",
             true,
-            new BookingShortResponseDto(1L, 1L, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(1)),
-            new BookingShortResponseDto(1L, 1L, LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(4)),
+            lastBookingShortResponseDto,
+            nextBookingShortResponseDto,
             Collections.emptyList()
     );
 
@@ -112,14 +135,24 @@ public class ItemServiceImplTest {
     @Test
     void readTest() {
         Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item1));
+        Mockito.when(bookingRepository.getLastBookingsForItems(anySet(), any(BookingStatus.class)))
+                .thenReturn(List.of(lastBookingShort));
+        Mockito.when(bookingRepository.getNextBookingsForItems(anySet(), any(BookingStatus.class)))
+                .thenReturn(List.of(nextBookingShort));
 
         ItemResponseDto createdItem = itemService.read(1L, 1L);
         assertNotNull(createdItem);
-        assertEquals(itemDto1.getId(), createdItem.getId());
-        assertEquals(itemDto1.getName(), createdItem.getName());
-        assertEquals(itemDto1.getDescription(), createdItem.getDescription());
-        assertEquals(itemDto1.getAvailable(), createdItem.getAvailable());
-        assertEquals(itemDto1.getRequestId(), createdItem.getRequestId());
+        assertEquals(itemResponseDto1.getId(), createdItem.getId());
+        assertEquals(itemResponseDto1.getName(), createdItem.getName());
+        assertEquals(itemResponseDto1.getDescription(), createdItem.getDescription());
+        assertEquals(itemResponseDto1.getAvailable(), createdItem.getAvailable());
+        assertEquals(itemResponseDto1.getRequestId(), createdItem.getRequestId());
+        assertEquals(itemResponseDto1.getLastBooking().getId(), createdItem.getLastBooking().getId());
+        assertEquals(itemResponseDto1.getNextBooking().getId(), createdItem.getNextBooking().getId());
+
+        Mockito.when(itemRepository.findById(Long.MAX_VALUE)).thenReturn(Optional.empty());
+        assertThrows(ItemNotFoundException.class, () -> itemService.read(user1.getId(), Long.MAX_VALUE));
+
     }
 
     @Test
