@@ -69,7 +69,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void bookTest() throws Exception{
+    void bookTest() throws Exception {
         Mockito
                 .when(bookingController.book(Mockito.anyLong(), Mockito.any(BookingDto.class)))
                 .thenReturn(responseDto);
@@ -107,7 +107,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void reviewTest() throws Exception{
+    void reviewTest() throws Exception {
         Mockito
                 .when(bookingController.review(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean()))
                 .thenReturn(responseDto);
@@ -145,7 +145,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void getTest() throws Exception{
+    void getTest() throws Exception {
         Mockito
                 .when(bookingController.get(Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(responseDto);
@@ -182,7 +182,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void getOwnBookingsTest() throws Exception{
+    void getOwnBookingsTest() throws Exception {
         Mockito.when(bookingController.getOwnBookings(
                 Mockito.anyLong(), Mockito.any(BookingState.class), Mockito.anyLong(), Mockito.anyLong())
         ).thenReturn(List.of(responseDto));
@@ -231,7 +231,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void findOwnItemsBookingsTest() throws Exception{
+    void findOwnItemsBookingsTest() throws Exception {
         Mockito
                 .when(bookingController.findOwnItemsBookings(
                         Mockito.anyLong(), Mockito.any(BookingState.class), Mockito.anyLong(), Mockito.anyLong())

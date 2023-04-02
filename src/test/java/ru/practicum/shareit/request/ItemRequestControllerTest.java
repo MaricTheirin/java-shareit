@@ -4,26 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.mapper.ItemRequestDtoMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestService;
-import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserResponseDto;
-import ru.practicum.shareit.user.mapper.UserDtoMapper;
 import ru.practicum.shareit.user.model.User;
 
 import java.nio.charset.StandardCharsets;
@@ -32,7 +23,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,15 +46,8 @@ public class ItemRequestControllerTest {
     );
     private final ItemRequestResponseDto itemRequestResponseDto = ItemRequestDtoMapper.mapItemRequestToResponseDto(itemRequest);
 
-    //    private final UserDto updatedUserDto =
-    //            new UserDto(1L, "upd_".concat(userDto.getName()), "upd_".concat(userDto.getEmail()));
-    //    private final User updatedUser = UserDtoMapper.mapDtoToUser(updatedUserDto);
-    ////    private final UserResponseDto userResponseDto = UserDtoMapper.mapUserToResponseDto(user);
-    ////    private final UserResponseDto updatedUserResponseDto = UserDtoMapper.mapUserToResponseDto(updatedUser);
-////    private final Pageable pageable = PageRequest.of(0, 20);
-
     @Test
-    void createRequestTest() throws Exception{
+    void createRequestTest() throws Exception {
         Mockito.when(itemRequestService.create(anyLong(), any(ItemRequestDto.class)))
                 .thenReturn(itemRequestResponseDto);
 
@@ -88,7 +73,7 @@ public class ItemRequestControllerTest {
     }
 
     @Test
-    void getRequestByIdTest() throws Exception{
+    void getRequestByIdTest() throws Exception {
         Mockito.when(itemRequestService.read(anyLong(), eq(itemRequest.getId())))
                 .thenReturn(itemRequestResponseDto);
 
@@ -105,7 +90,7 @@ public class ItemRequestControllerTest {
     }
 
     @Test
-    void readUserRequestsTest() throws Exception{
+    void readUserRequestsTest() throws Exception {
         Mockito.when(itemRequestService.readUserRequests(anyLong()))
                 .thenReturn(List.of(itemRequestResponseDto));
 
@@ -123,7 +108,7 @@ public class ItemRequestControllerTest {
     }
 
     @Test
-    void readAllUsersRequests() throws Exception{
+    void readAllUsersRequests() throws Exception {
         Mockito.when(itemRequestService.readAllUsersRequests(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemRequestResponseDto));
 
