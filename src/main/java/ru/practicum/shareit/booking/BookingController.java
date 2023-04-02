@@ -11,14 +11,14 @@ import ru.practicum.shareit.service.validation.Create;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/bookings")
+@RequestMapping("/bookings")
 @RequiredArgsConstructor
 public class BookingController {
 
     private final BookingService bookingService;
 
     @PostMapping
-    protected BookingResponseDto book(
+    public BookingResponseDto book(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @Validated({Create.class}) @RequestBody BookingDto bookingDto
     ) {
@@ -26,7 +26,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    protected BookingResponseDto review(
+    public BookingResponseDto review(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable long bookingId,
             @RequestParam Boolean approved
@@ -35,7 +35,7 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    protected BookingResponseDto get(
+    public BookingResponseDto get(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long bookingId
     ) {
@@ -43,7 +43,7 @@ public class BookingController {
     }
 
     @GetMapping
-    protected List<BookingResponseDto> getOwnBookings(
+    public List<BookingResponseDto> getOwnBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(name = "from", defaultValue = "0") long from,
@@ -53,7 +53,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    protected List<BookingResponseDto> findOwnItemsBookings(
+    public List<BookingResponseDto> findOwnItemsBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(name = "from", defaultValue = "0") long from,
