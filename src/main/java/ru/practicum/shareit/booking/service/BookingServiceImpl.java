@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
-    private final BookingDtoMapper bookingDtoMapper;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
 
@@ -41,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
                 BookingDtoMapper.mapDtoToBooking(bookingDto, item, booker)
         );
         log.trace("Сохранённый предмет: {}", savedBooking);
-        return BookingDtoMapper.mapBookingToResultDto(savedBooking);
+        return BookingDtoMapper.mapBookingToResponseDto(savedBooking);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(BookingNotFoundException::new);
         log.trace("По bookingId = {} получен {}", bookingId, booking);
         checkBeforeGet(userId, booking);
-        return BookingDtoMapper.mapBookingToResultDto(booking);
+        return BookingDtoMapper.mapBookingToResponseDto(booking);
     }
 
     @Override
@@ -72,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
         checkBeforeReview(userId, booking);
 
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        return BookingDtoMapper.mapBookingToResultDto(booking);
+        return BookingDtoMapper.mapBookingToResponseDto(booking);
     }
 
     @Override
@@ -88,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> foundBookings =
                 bookingRepository.findAllByUserBookingsAndFilterByStateOrderByIdAsc(userId, bookingState, from, size);
         log.trace("Полученный результат: {}", foundBookings);
-        return foundBookings.stream().map(BookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
+        return foundBookings.stream().map(BookingDtoMapper::mapBookingToResponseDto).collect(Collectors.toList());
     }
 
     @Override
@@ -101,9 +100,10 @@ public class BookingServiceImpl implements BookingService {
         checkIfUserExists(userId);
         checkPagingParameters(from, size);
 
-        List<Booking> foundBookings = bookingRepository.findAllByUserItemsAndFilterByState(userId, bookingState, from, size);
+        List<Booking> foundBookings =
+                bookingRepository.findAllByUserItemsAndFilterByState(userId, bookingState, from, size);
         log.trace("Полученный результат: {}", foundBookings);
-        return foundBookings.stream().map(BookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
+        return foundBookings.stream().map(BookingDtoMapper::mapBookingToResponseDto).collect(Collectors.toList());
     }
 
     private void checkBeforeGet(Long userId, Booking booking) {
