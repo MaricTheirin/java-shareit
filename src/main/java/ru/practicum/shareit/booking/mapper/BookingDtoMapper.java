@@ -21,7 +21,7 @@ public class BookingDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
 
-    public static BookingResponseDto mapBookingToResultDto(Booking booking) {
+    public static BookingResponseDto mapBookingToResponseDto(Booking booking) {
         BookingResponseDto resultDto = new BookingResponseDto(
                 booking.getId(),
                 booking.getStart(),
