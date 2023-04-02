@@ -48,7 +48,8 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponseDto read(Long userId, Long bookingId) {
         log.debug("Пользователь с id = {} запросил информацию об аренде с id = {}", userId, bookingId);
 
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(BookingNotFoundException::new);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException("Бронь с ID = " + bookingId + " не существует"));
         log.trace("По bookingId = {} получен {}", bookingId, booking);
         checkBeforeGet(userId, booking);
         return BookingDtoMapper.mapBookingToResponseDto(booking);

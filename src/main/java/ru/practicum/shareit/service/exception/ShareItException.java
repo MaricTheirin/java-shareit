@@ -4,11 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public abstract class ShareItException extends RuntimeException {
 
-    private HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-
-    public ShareItException(String message) {
-        super(message);
-    }
+    private final HttpStatus status;
 
     public ShareItException(String message, HttpStatus status) {
         super(message);

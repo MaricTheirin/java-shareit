@@ -8,7 +8,4 @@ public class BookingNotFoundException extends NotFoundException {
         super(message);
     }
 
-    public BookingNotFoundException() {
-        super("Запрошенная бронь не существует");
-    }
 }
