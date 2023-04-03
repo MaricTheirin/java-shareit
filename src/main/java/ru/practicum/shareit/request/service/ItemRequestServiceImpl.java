@@ -68,7 +68,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemRequestResponseDto> readAllUsersRequests(Long userId, int from, int size) {
-        log.debug("Пользователь с ID = {} запросил список всех запросов на предметыс разбивкой [{},{}]",
+        log.debug("Пользователь с ID = {} запросил список всех запросов на предметы с разбивкой [{},{}]",
                 userId, from, size
         );
         checkIfUserExist(userId);

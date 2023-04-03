@@ -79,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public List<BookingResponseDto> findOwnBookings(Long userId, BookingState bookingState, int from, int size) {
         log.debug(
-                "Пользователь с id = {} запросил информацию о всех своих арендах в состоянии {} с лимитами [{}, {}]",
+                "Пользователь с id = {} запросил информацию о всех своих арендах в состоянии {} с разбивкой [{}, {}]",
                 userId, bookingState, from, size
         );
         checkIfUserExists(userId);
@@ -94,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public List<BookingResponseDto> findOwnItemsBookings(Long userId, BookingState bookingState, int from, int size) {
         log.debug(
-                "Пользователь с id = {} запросил информацию об арендах своих вещей в состоянии {} с лимитами [{}, {}]",
+                "Пользователь с id = {} запросил информацию об арендах своих вещей в состоянии {} с разбивкой [{}, {}]",
                 userId, bookingState, from, size
         );
         checkIfUserExists(userId);
