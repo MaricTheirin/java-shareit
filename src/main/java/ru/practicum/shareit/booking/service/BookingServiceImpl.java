@@ -83,7 +83,6 @@ public class BookingServiceImpl implements BookingService {
                 userId, bookingState, from, size
         );
         checkIfUserExists(userId);
-        checkPagingParameters(from, size);
 
         List<Booking> foundBookings =
                 bookingRepository.findAllByUserBookingsAndFilterByStateOrderByIdAsc(userId, bookingState, from, size);
@@ -99,7 +98,6 @@ public class BookingServiceImpl implements BookingService {
                 userId, bookingState, from, size
         );
         checkIfUserExists(userId);
-        checkPagingParameters(from, size);
 
         List<Booking> foundBookings =
                 bookingRepository.findAllByUserItemsAndFilterByState(userId, bookingState, from, size);
@@ -150,15 +148,6 @@ public class BookingServiceImpl implements BookingService {
 
     private boolean checkIfItemIsOwnedByUser(long itemId, long userId) {
         return itemRepository.existsItemByIdAndOwnerId(itemId, userId);
-    }
-
-    private void checkPagingParameters(int page, int size) {
-        if (size <= 0) {
-            throw new IllegalArgumentException("Page size must not be less than one");
-        }
-        if (page < 0) {
-            throw new IllegalArgumentException("Page number must not be less than zero");
-        }
     }
 
     private boolean isItemAvailable(Long itemId) {
