@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BookingControllerTest {
 
     @MockBean
-    BookingController bookingController;
+    private BookingController bookingController;
 
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
@@ -69,7 +69,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void bookTest() throws Exception {
+    public void bookTest() throws Exception {
         Mockito
                 .when(bookingController.book(Mockito.anyLong(), Mockito.any(BookingDto.class)))
                 .thenReturn(responseDto);
@@ -184,7 +184,7 @@ public class BookingControllerTest {
     @Test
     void getOwnBookingsTest() throws Exception {
         Mockito.when(bookingController.getOwnBookings(
-                Mockito.anyLong(), Mockito.any(BookingState.class), Mockito.anyLong(), Mockito.anyLong())
+                Mockito.anyLong(), Mockito.any(BookingState.class), Mockito.anyInt(), Mockito.anyInt())
         ).thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/bookings", 1L)
@@ -234,7 +234,7 @@ public class BookingControllerTest {
     void findOwnItemsBookingsTest() throws Exception {
         Mockito
                 .when(bookingController.findOwnItemsBookings(
-                        Mockito.anyLong(), Mockito.any(BookingState.class), Mockito.anyLong(), Mockito.anyLong())
+                        Mockito.anyLong(), Mockito.any(BookingState.class), Mockito.anyInt(), Mockito.anyInt())
                 ).thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/bookings/owner", 1L)
