@@ -24,7 +24,7 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
     }
 
     @Override
-    public List<Booking> findAllByUserItemsAndFilterByState(Long userId, BookingState state, long from, long size) {
+    public List<Booking> findAllByUserItemsAndFilterByState(Long userId, BookingState state, int from, int size) {
         return findBookingsByUserAndState(userId, state, SearchBy.USER_ITEMS, from, size);
     }
 
@@ -32,8 +32,8 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
     public List<Booking> findAllByUserBookingsAndFilterByStateOrderByIdAsc(
             Long userId,
             BookingState state,
-            long from,
-            long size
+            int from,
+            int size
     ) {
         return findBookingsByUserAndState(userId, state, SearchBy.USER_BOOKINGS, from, size);
     }
@@ -42,8 +42,8 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
             long userId,
             BookingState state,
             SearchBy searchBy,
-            long from,
-            long size
+            int from,
+            int size
     ) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         QBooking booking = QBooking.booking;

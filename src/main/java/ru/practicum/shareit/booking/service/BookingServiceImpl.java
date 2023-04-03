@@ -77,7 +77,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingResponseDto> findOwnBookings(Long userId, BookingState bookingState, long from, long size) {
+    public List<BookingResponseDto> findOwnBookings(Long userId, BookingState bookingState, int from, int size) {
         log.debug(
                 "Пользователь с id = {} запросил информацию о всех своих арендах в состоянии {} с лимитами [{}, {}]",
                 userId, bookingState, from, size
@@ -93,7 +93,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingResponseDto> findOwnItemsBookings(Long userId, BookingState bookingState, long from, long size) {
+    public List<BookingResponseDto> findOwnItemsBookings(Long userId, BookingState bookingState, int from, int size) {
         log.debug(
                 "Пользователь с id = {} запросил информацию об арендах своих вещей в состоянии {} с лимитами [{}, {}]",
                 userId, bookingState, from, size
@@ -152,7 +152,7 @@ public class BookingServiceImpl implements BookingService {
         return itemRepository.existsItemByIdAndOwnerId(itemId, userId);
     }
 
-    private void checkPagingParameters(long page, long size) {
+    private void checkPagingParameters(int page, int size) {
         if (size <= 0) {
             throw new IllegalArgumentException("Page size must not be less than one");
         }

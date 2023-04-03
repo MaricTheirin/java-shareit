@@ -13,8 +13,8 @@ public interface BookingService {
 
     BookingResponseDto review(Long userId, Long bookingId, Boolean approved);
 
-    List<BookingResponseDto> findOwnBookings(Long userId, BookingState state, long from, long size);
+    List<BookingResponseDto> findOwnBookings(Long userId, BookingState state, int from, int size);
 
-    List<BookingResponseDto> findOwnItemsBookings(Long userId, BookingState state, long from, long size);
+    List<BookingResponseDto> findOwnItemsBookings(Long userId, BookingState state, int from, int size);
 
 }

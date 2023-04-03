@@ -91,7 +91,7 @@ public class DefaultExceptionHandler {
                 .collect(Collectors.joining("; "));
         return new ResponseEntity<>(
                 new ExceptionMessage("Ошибка при проверке: " + errorMessage, request.getRequestURI()),
-                HttpStatus.CONFLICT
+                HttpStatus.BAD_REQUEST
         );
     }
 
