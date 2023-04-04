@@ -24,6 +24,7 @@ import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.mapper.UserDtoMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,7 +56,7 @@ public class ItemRequestServiceImplTest {
     private final ItemRequestDto itemRequestDto = new ItemRequestDto("Request#1_description");
     private final ItemRequest itemRequest = ItemRequestDtoMapper.mapDtoToItemRequest(user, itemRequestDto);
     private final ItemRequestResponseDto itemRequestResponseDto =
-            ItemRequestDtoMapper.mapItemRequestToResponseDto(itemRequest);
+            ItemRequestDtoMapper.mapItemRequestToResponseDto(itemRequest, Collections.emptyList());
     private final Pageable pageable = PageRequest.of(0, 20);
 
     @BeforeEach

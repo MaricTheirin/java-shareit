@@ -42,9 +42,10 @@ public class ItemRequestControllerTest {
     private final ItemRequestDto itemRequestDto = new ItemRequestDto("Request#1_description");
     private final ItemRequestDto itemRequestTooShortDto = new ItemRequestDto("");
     private final ItemRequest itemRequest = new ItemRequest(
-            1L, user, itemRequestDto.getDescription(), LocalDateTime.now().withNano(0), Collections.emptyList()
+            1L, user, itemRequestDto.getDescription(), LocalDateTime.now().withNano(0)
     );
-    private final ItemRequestResponseDto itemRequestResponseDto = ItemRequestDtoMapper.mapItemRequestToResponseDto(itemRequest);
+    private final ItemRequestResponseDto itemRequestResponseDto =
+            ItemRequestDtoMapper.mapItemRequestToResponseDto(itemRequest, Collections.emptyList());
 
     @Test
     void createRequestTest() throws Exception {
