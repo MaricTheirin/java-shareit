@@ -35,10 +35,4 @@ public class ItemRequest {
     @CreationTimestamp
     private LocalDateTime created;
 
-    @OneToMany
-    @JoinColumn(name = "request_id")
-    @ToString.Exclude
-    private List<Item> items;
-
-
 }

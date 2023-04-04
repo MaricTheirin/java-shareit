@@ -4,15 +4,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.practicum.shareit.item.dto.ItemShortResponseDto;
-import ru.practicum.shareit.item.mapper.ItemDtoMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -25,18 +22,17 @@ public class ItemRequestDtoMapper {
                 0L,
                 author,
                 itemRequestDto.getDescription(),
-                LocalDateTime.now(),
-                Collections.emptyList()
+                LocalDateTime.now()
         );
 
         log.trace(OBJECT_MAPPED_MESSAGE, itemRequestDto, mappedRequest);
         return mappedRequest;
     }
 
-    public static ItemRequestResponseDto mapItemRequestToResponseDto(ItemRequest request) {
-
-        List<ItemShortResponseDto> items =
-                request.getItems().stream().map(ItemDtoMapper::mapItemToShortResponseDto).collect(Collectors.toList());
+    public static ItemRequestResponseDto mapItemRequestToResponseDto(
+            ItemRequest request,
+            List<ItemShortResponseDto> items
+    ) {
 
         ItemRequestResponseDto mappedResponseDto = new ItemRequestResponseDto(
                 request.getId(),

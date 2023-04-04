@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.item.dto.ItemShortResponseDto;
+import ru.practicum.shareit.item.mapper.ItemDtoMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
@@ -14,7 +16,7 @@ import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +36,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequest savedRequest =
                 itemRequestRepository.save(ItemRequestDtoMapper.mapDtoToItemRequest(user, itemRequestDto));
         log.trace("Запрос сохранён: {}", savedRequest);
-        return ItemRequestDtoMapper.mapItemRequestToResponseDto(savedRequest);
+        return ItemRequestDtoMapper.mapItemRequestToResponseDto(savedRequest, Collections.emptyList());
     }
 
     @Override
@@ -47,7 +49,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .findById(itemRequestId)
                 .orElseThrow(ItemRequestNotFoundException::new);
         log.trace("Получен запрос: {}", savedRequest);
-        return ItemRequestDtoMapper.mapItemRequestToResponseDto(savedRequest);
+        return addItemsAndMapToItemResponseDto(savedRequest);
     }
 
     @Override
@@ -59,10 +61,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<ItemRequest> foundRequests = itemRequestRepository
                 .findAllByUserIdOrderByCreatedDesc(userId)
                 .orElseThrow(ItemRequestNotFoundException::new);
+
         log.trace("Получен список запросов: {}", foundRequests);
-        return foundRequests.stream()
-                .map(ItemRequestDtoMapper::mapItemRequestToResponseDto)
-                .collect(Collectors.toList());
+        return addItemsAndMapToItemResponseDtoList(foundRequests);
     }
 
     @Override
@@ -78,9 +79,39 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .orElseThrow(ItemRequestNotFoundException::new);
         log.trace("Получен список запросов: {}", foundRequests);
 
-        return foundRequests.stream()
-                .map(ItemRequestDtoMapper::mapItemRequestToResponseDto)
+        return addItemsAndMapToItemResponseDtoList(foundRequests);
+    }
+
+    private ItemRequestResponseDto addItemsAndMapToItemResponseDto(ItemRequest request) {
+        return ItemRequestDtoMapper.mapItemRequestToResponseDto(request, findItemsForItemRequest(request.getId()));
+    }
+
+    private List<ItemRequestResponseDto> addItemsAndMapToItemResponseDtoList(List<ItemRequest> requests) {
+        Map<Long, List<ItemShortResponseDto>> requestsItems = findItemsForItemRequests(requests);
+        return requests.stream()
+                .map(request -> ItemRequestDtoMapper.mapItemRequestToResponseDto(
+                        request,
+                        requestsItems.getOrDefault(request.getId(), Collections.emptyList())
+                )).collect(Collectors.toList());
+    }
+
+    private List<ItemShortResponseDto> findItemsForItemRequest(long itemRequestId) {
+        return itemRequestRepository.findAllByItemRequestIdIn(Set.of(itemRequestId))
+                .stream()
+                .map(ItemDtoMapper::mapItemToShortResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    private Map<Long, List<ItemShortResponseDto>> findItemsForItemRequests(List<ItemRequest> requests) {
+        return findItemsForItemRequests(requests.stream().map(ItemRequest::getId).collect(Collectors.toSet()));
+    }
+
+    private Map<Long, List<ItemShortResponseDto>> findItemsForItemRequests(Set<Long> itemRequestsIds) {
+        return itemRequestRepository
+                .findAllByItemRequestIdIn(itemRequestsIds)
+                .stream()
+                .map(ItemDtoMapper::mapItemToShortResponseDto)
+                .collect(Collectors.groupingBy(ItemShortResponseDto::getRequestId, Collectors.toList()));
     }
 
     private void checkIfUserExist(Long userId) {
