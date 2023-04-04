@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserResponseDto;
 import ru.practicum.shareit.user.mapper.UserDtoMapper;
 import ru.practicum.shareit.user.model.User;
-
 import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -37,13 +36,22 @@ public class DefaultExceptionHandlerTest {
 
     @Test
     void testExceptionHandler_handleMethodArgumentNotValidException() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/bokings")
+
+        mvc.perform(MockMvcRequestBuilders.get("/bookings")
                     .header("X-Sharer-User-Id", "1")
                     .param("from", "-1")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .characterEncoding(StandardCharsets.UTF_8)
-                ).andExpect(status().isNotFound());
+                ).andExpect(status().isBadRequest());
+
+        mvc.perform(MockMvcRequestBuilders.get("/bookings")
+                .header("X-Sharer-User-Id", "1")
+                .param("size", "-1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding(StandardCharsets.UTF_8)
+        ).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -75,12 +83,5 @@ public class DefaultExceptionHandlerTest {
                 .characterEncoding(StandardCharsets.UTF_8)
         ).andExpect(status().isConflict());
     }
-
-    @Test
-    void testExceptionHandler_handleSQLException() throws Exception {
-
-
-    }
-
 
 }

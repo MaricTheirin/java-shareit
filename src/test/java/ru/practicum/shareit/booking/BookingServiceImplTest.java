@@ -8,7 +8,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
-import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
 import ru.practicum.shareit.booking.exception.BookingException;
 import ru.practicum.shareit.booking.exception.BookingNotFoundException;
 import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
@@ -17,8 +16,6 @@ import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.exception.ItemNotAvailableException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -26,9 +23,7 @@ import ru.practicum.shareit.service.exception.AccessException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,14 +48,6 @@ public class BookingServiceImplTest {
 
     private final User user1 = new User(1, "User#1", "User1@server.com");
 
-    private final ItemDto itemDto1 = new ItemDto(
-            1L,
-            null,
-            "Item#1_name",
-            "Item#1_desc",
-            true
-    );
-
     private final Item item1 = new Item(
             1L,
             null,
@@ -68,17 +55,6 @@ public class BookingServiceImplTest {
             "Item#1_name",
             "Item#1_desc",
             true
-    );
-
-    private final ItemResponseDto itemResponseDto1 = new ItemResponseDto(
-            1L,
-            null,
-            "Item#1_name",
-            "Item#1_desc",
-            true,
-            new BookingShortResponseDto(1L, 1L, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(1)),
-            new BookingShortResponseDto(1L, 1L, LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(4)),
-            Collections.emptyList()
     );
 
     private final BookingDto bookingDto = new BookingDto(
@@ -188,7 +164,7 @@ public class BookingServiceImplTest {
     void findOwnBookings() {
         Mockito.when(userRepository.existsById(user1.getId())).thenReturn(true);
         Mockito.when(bookingRepository.findAllByUserBookingsAndFilterByStateOrderByIdAsc(
-                    eq(user1.getId()), eq(BookingState.WAITING), anyLong(), anyLong())
+                    eq(user1.getId()), eq(BookingState.WAITING), anyInt(), anyInt())
                 ).thenReturn(List.of(booking));
 
         List<BookingResponseDto> createdBookings =
@@ -199,18 +175,13 @@ public class BookingServiceImplTest {
         assertEquals(booking.getStatus(), createdBookings.get(0).getStatus());
         assertEquals(booking.getStart(), createdBookings.get(0).getStart());
         assertEquals(booking.getEnd(), createdBookings.get(0).getEnd());
-
-        assertThrows(IllegalArgumentException.class, () ->
-                bookingService.findOwnBookings(user1.getId(), BookingState.WAITING, -1L, 20L));
-        assertThrows(IllegalArgumentException.class, () ->
-                bookingService.findOwnBookings(user1.getId(), BookingState.WAITING, 1L, 0L));
     }
 
     @Test
     void findOwnItemsBookingsTest() {
         Mockito.when(userRepository.existsById(user1.getId())).thenReturn(true);
         Mockito.when(bookingRepository.findAllByUserItemsAndFilterByState(
-                eq(user1.getId()), eq(BookingState.WAITING), anyLong(), anyLong())
+                eq(user1.getId()), eq(BookingState.WAITING), anyInt(), anyInt())
         ).thenReturn(List.of(booking));
 
         List<BookingResponseDto> createdBookings =
@@ -224,7 +195,7 @@ public class BookingServiceImplTest {
 
         Mockito.when(userRepository.existsById(eq(Long.MAX_VALUE))).thenReturn(false);
         assertThrows(UserNotFoundException.class, () ->
-                bookingService.findOwnItemsBookings(Long.MAX_VALUE, BookingState.WAITING, 0L, 0L));
+                bookingService.findOwnItemsBookings(Long.MAX_VALUE, BookingState.WAITING, 0, 0));
 
     }
 
