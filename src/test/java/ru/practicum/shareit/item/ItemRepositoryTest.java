@@ -46,8 +46,7 @@ public class ItemRepositoryTest {
 
     @Test
     void findAllByOwnerIdOrderByIdAscTest() {
-        List<Item> itemsFoundByOwner =
-                itemRepository.findAllByOwnerIdOrderByIdAsc(user.getId()).orElseThrow(ItemNotFoundException::new);
+        List<Item> itemsFoundByOwner = itemRepository.findAllByOwnerIdOrderByIdAsc(user.getId());
         assertEquals(2, itemsFoundByOwner.size(), "Пользователю должно принадлежать 2 предмета");
         assertEquals(1L, itemsFoundByOwner.get(0).getId(), "Массив предметов не отсортирован по ID");
     }

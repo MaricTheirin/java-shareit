@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
@@ -45,6 +46,9 @@ public class ItemRequestServiceImplTest {
 
     @Mock
     UserRepository userRepository;
+
+    @Mock
+    ItemRepository itemRepository;
 
     private final UserDto userDto = new UserDto(1L, "User#1", "user1@server.com");
     private final UserDto updatedUserDto =
@@ -82,6 +86,7 @@ public class ItemRequestServiceImplTest {
     void readTest() {
         Mockito.when(userRepository.existsById(user.getId())).thenReturn(true);
         Mockito.when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.of(itemRequest));
+        Mockito.when(itemRepository.findAllItemsByItemRequestIdIn(anySet())).thenReturn(Collections.emptyList());
 
         ItemRequestResponseDto foundItemRequestResponseDto = itemRequestService.read(1L, 1L);
         assertEquals(itemRequestResponseDto.getId(), foundItemRequestResponseDto.getId());
@@ -101,7 +106,7 @@ public class ItemRequestServiceImplTest {
     void readUserRequestsTest() {
         Mockito.when(userRepository.existsById(user.getId())).thenReturn(true);
         Mockito.when(itemRequestRepository.findAllByUserIdOrderByCreatedDesc(itemRequest.getId()))
-                .thenReturn(Optional.of(List.of(itemRequest)));
+                .thenReturn(List.of(itemRequest));
 
         List<ItemRequestResponseDto> foundItemRequests = itemRequestService.readUserRequests(user.getId());
         assertEquals(1, foundItemRequests.size());
@@ -118,7 +123,7 @@ public class ItemRequestServiceImplTest {
     void readAllUsersRequestsTest() {
         Mockito.when(userRepository.existsById(anyLong())).thenReturn(true);
         Mockito.when(itemRequestRepository.findAllByUserIdNotOrderByCreatedDesc(anyLong(), eq(pageable)))
-                .thenReturn(Optional.of(List.of(itemRequest)));
+                .thenReturn(List.of(itemRequest));
 
         List<ItemRequestResponseDto> foundItemRequests = itemRequestService.readAllUsersRequests(user.getId() + 1, 0, 20);
         assertEquals(1, foundItemRequests.size());

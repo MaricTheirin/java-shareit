@@ -158,7 +158,7 @@ public class ItemServiceImplTest {
     @Test
     void updateTest() {
         Mockito.when(itemRepository.getItemByIdEqualsAndOwnerIdEquals(anyLong(), anyLong()))
-                .thenReturn(Optional.of(item1));
+                .thenReturn(item1);
 
         ItemResponseDto updatedItem = itemService.update(1L, 1L, itemDto1Updated);
         assertNotNull(updatedItem);
@@ -172,7 +172,7 @@ public class ItemServiceImplTest {
     @Test
     void deleteTest() {
         Mockito.when(itemRepository.getItemByIdEqualsAndOwnerIdEquals(anyLong(), anyLong()))
-                .thenReturn(Optional.of(item1));
+                .thenReturn(item1);
 
         ItemResponseDto deletedItem = itemService.delete(1L, 1L);
         assertNotNull(deletedItem);
@@ -207,7 +207,7 @@ public class ItemServiceImplTest {
     @Test
     void findAllTest() {
         Mockito.when(itemRepository.findAllByOwnerIdOrderByIdAsc(anyLong()))
-                .thenReturn(Optional.of(List.of(item1)));
+                .thenReturn(List.of(item1));
 
         List<ItemResponseDto> resultList = itemService.findAll(1L);
         assertNotNull(resultList);
