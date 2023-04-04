@@ -1,8 +1,8 @@
 package ru.practicum.shareit.request.mapper;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemShortResponseDto;
 import ru.practicum.shareit.item.mapper.ItemDtoMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemRequestDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";

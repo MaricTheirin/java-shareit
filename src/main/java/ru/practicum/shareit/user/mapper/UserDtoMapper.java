@@ -1,13 +1,14 @@
 package ru.practicum.shareit.user.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserResponseDto;
 import ru.practicum.shareit.user.model.User;
 
 @Slf4j
-@Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserDtoMapper {
 
     private static final String DEFAULT_MESSAGE = "Выполнено преобразование объекта из {} в {}";
