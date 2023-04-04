@@ -8,8 +8,6 @@ import java.util.Set;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findAllByItemId(Long itemId);
-
     @Query("SELECT new ru.practicum.shareit.item.model.Comment(c.id, c.text, c.item, c.author, c.created) " +
     "FROM Comment AS c " +
     "WHERE c.item.id in (:itemIds) " +

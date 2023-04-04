@@ -178,6 +178,13 @@
 					<version>0.8.8</version>
 					<configuration>
 						<output>file</output>
+						<excludes>
+							<exclude>ru/practicum/shareit/booking/model/QBooking.class</exclude>
+							<exclude>ru/practicum/shareit/item/model/QComment.class</exclude>
+							<exclude>ru/practicum/shareit/item/model/QItem.class</exclude>
+							<exclude>ru/practicum/shareit/user/model/QUser.class</exclude>
+							<exclude>ru/practicum/shareit/request/model/QItemRequest.class</exclude>
+						</excludes>
 					</configuration>
 					<executions>
 						<execution>

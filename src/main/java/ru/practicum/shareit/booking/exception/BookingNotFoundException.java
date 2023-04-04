@@ -1,10 +1,11 @@
 package ru.practicum.shareit.booking.exception;
 
-import org.springframework.http.HttpStatus;
-import ru.practicum.shareit.service.exception.ShareItException;
+import ru.practicum.shareit.service.exception.NotFoundException;
 
-public class BookingNotFoundException extends ShareItException {
+public class BookingNotFoundException extends NotFoundException {
+
     public BookingNotFoundException(String message) {
-        super(message, HttpStatus.NOT_FOUND);
+        super(message);
     }
+
 }

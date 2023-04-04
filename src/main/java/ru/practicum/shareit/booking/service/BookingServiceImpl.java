@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
-    private final BookingDtoMapper bookingDtoMapper;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
 
@@ -33,15 +32,15 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponseDto create(Long userId, BookingDto bookingDto) {
         log.debug("Пользователь с id = {} пытается взять в аренду: {}", userId, bookingDto);
+        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(ItemNotFoundException::new);
         checkBeforeSave(userId, bookingDto);
-        Item item = itemRepository.getReferenceById(bookingDto.getItemId());
-        User booker = userRepository.getReferenceById(userId);
+        User booker = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         Booking savedBooking = bookingRepository.saveAndFlush(
-                bookingDtoMapper.mapDtoToBooking(bookingDto, item, booker)
+                BookingDtoMapper.mapDtoToBooking(bookingDto, item, booker)
         );
         log.trace("Сохранённый предмет: {}", savedBooking);
-        return bookingDtoMapper.mapBookingToResultDto(savedBooking);
+        return BookingDtoMapper.mapBookingToResponseDto(savedBooking);
     }
 
     @Override
@@ -49,11 +48,11 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponseDto read(Long userId, Long bookingId) {
         log.debug("Пользователь с id = {} запросил информацию об аренде с id = {}", userId, bookingId);
 
-        checkIfBookingExists(bookingId);
-        Booking booking = bookingRepository.getReferenceById(bookingId);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException("Бронь с ID = " + bookingId + " не существует"));
         log.trace("По bookingId = {} получен {}", bookingId, booking);
         checkBeforeGet(userId, booking);
-        return bookingDtoMapper.mapBookingToResultDto(booking);
+        return BookingDtoMapper.mapBookingToResponseDto(booking);
     }
 
     @Override
@@ -65,46 +64,48 @@ public class BookingServiceImpl implements BookingService {
                 bookingId,
                 approved
         );
-        if (!bookingRepository.existsById(bookingId)) {
-            log.warn("Запроса на бронирование с id = {} не существует", bookingId);
-            throw new BookingNotFoundException("Запроса на бронирование с id = " + bookingId + " не существует");
-        }
-        Booking booking = bookingRepository.getReferenceById(bookingId);
+        Booking booking = bookingRepository
+                .findById(bookingId)
+                .orElseThrow(() ->
+                        new BookingNotFoundException("Запроса на бронирование с id = " + bookingId + " не существует"));
+
         checkBeforeReview(userId, booking);
 
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        bookingRepository.saveAndFlush(booking);
-        return bookingDtoMapper.mapBookingToResultDto(booking);
+        return BookingDtoMapper.mapBookingToResponseDto(booking);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingResponseDto> findOwnBookings(Long userId, String state) {
-        log.debug("Пользователь с id = {} запросил информацию о всех своих арендах в состоянии {}", userId, state);
+    public List<BookingResponseDto> findOwnBookings(Long userId, BookingState bookingState, int from, int size) {
+        log.debug(
+                "Пользователь с id = {} запросил информацию о всех своих арендах в состоянии {} с разбивкой [{}, {}]",
+                userId, bookingState, from, size
+        );
         checkIfUserExists(userId);
-        BookingState bookingState = findStateForUserString(state);
 
-        List<Booking> foundBookings = bookingRepository.findAllByUserBookingsAndFilterByState(userId, bookingState);
+        List<Booking> foundBookings =
+                bookingRepository.findAllByUserBookingsAndFilterByStateOrderByIdAsc(userId, bookingState, from, size);
         log.trace("Полученный результат: {}", foundBookings);
-        return foundBookings.stream().map(bookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
+        return foundBookings.stream().map(BookingDtoMapper::mapBookingToResponseDto).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingResponseDto> findOwnItemsBookings(Long userId, String state) {
-        log.debug("Пользователь с id = {} запросил информацию об арендах своих вещей в состоянии {}", userId, state);
-        BookingState bookingState = findStateForUserString(state);
-
+    public List<BookingResponseDto> findOwnItemsBookings(Long userId, BookingState bookingState, int from, int size) {
+        log.debug(
+                "Пользователь с id = {} запросил информацию об арендах своих вещей в состоянии {} с разбивкой [{}, {}]",
+                userId, bookingState, from, size
+        );
         checkIfUserExists(userId);
 
-        List<Booking> foundBookings = bookingRepository.findAllByUserItemsAndFilterByState(userId, bookingState);
+        List<Booking> foundBookings =
+                bookingRepository.findAllByUserItemsAndFilterByState(userId, bookingState, from, size);
         log.trace("Полученный результат: {}", foundBookings);
-        return foundBookings.stream().map(bookingDtoMapper::mapBookingToResultDto).collect(Collectors.toList());
+        return foundBookings.stream().map(BookingDtoMapper::mapBookingToResponseDto).collect(Collectors.toList());
     }
 
     private void checkBeforeGet(Long userId, Booking booking) {
-        checkIfUserExists(userId);
-
         Item item = booking.getItem();
         if (!userId.equals(booking.getBooker().getId()) && !userId.equals(item.getOwner().getId())) {
             log.warn("Пользователь {} не имеет доступа к просмотру бронирования {}", userId, booking);
@@ -113,9 +114,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkBeforeSave(Long userId, BookingDto bookingDto) {
-        checkIfUserExists(userId);
-        checkIfItemExists(bookingDto.getItemId());
-
         if (checkIfItemIsOwnedByUser(bookingDto.getItemId(), userId)) {
             log.warn("Пользователь {} пытается забронировать свою же вещь с id {}", userId, bookingDto.getItemId());
             throw new BookingNotFoundException("Нельзя забронировать собственную вещь");
@@ -148,28 +146,8 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void checkIfItemExists(Long itemId) {
-        if (!itemRepository.existsById(itemId)) {
-            throw new ItemNotFoundException("Запрошенный предмет не существует");
-        }
-    }
-
-    private void checkIfBookingExists(Long bookingId) {
-        if (!bookingRepository.existsById(bookingId)) {
-            throw new BookingNotFoundException("Запрошенная бронь не существует");
-        }
-    }
-
     private boolean checkIfItemIsOwnedByUser(long itemId, long userId) {
         return itemRepository.existsItemByIdAndOwnerId(itemId, userId);
-    }
-
-    private BookingState findStateForUserString(String stringState) {
-        try {
-            return BookingState.valueOf(stringState.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new BookingUnsupportedStateException("Unknown state: " + stringState);
-        }
     }
 
     private boolean isItemAvailable(Long itemId) {

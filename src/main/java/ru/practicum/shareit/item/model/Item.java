@@ -18,6 +18,9 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "request_id")
+    private Long requestId;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "owner_id", nullable = false)
     @ToString.Exclude

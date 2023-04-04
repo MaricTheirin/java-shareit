@@ -91,7 +91,7 @@ public class DefaultExceptionHandler {
                 .collect(Collectors.joining("; "));
         return new ResponseEntity<>(
                 new ExceptionMessage("Ошибка при проверке: " + errorMessage, request.getRequestURI()),
-                HttpStatus.CONFLICT
+                HttpStatus.BAD_REQUEST
         );
     }
 
@@ -104,6 +104,18 @@ public class DefaultExceptionHandler {
         return new ResponseEntity<>(
                 new ExceptionMessage("Запрошенная информация не обнаружена", request.getRequestURI()),
                 HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<ExceptionMessage> handleIllegalArgumentException(
+            IllegalArgumentException exception,
+            HttpServletRequest request
+    ) {
+        logException(exception, request);
+        return new ResponseEntity<>(
+                new ExceptionMessage("Некорректный запрос", request.getRequestURI()),
+                HttpStatus.BAD_REQUEST
         );
     }
 

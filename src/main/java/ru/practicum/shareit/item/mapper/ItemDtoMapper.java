@@ -1,30 +1,32 @@
 package ru.practicum.shareit.item.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.item.dto.ItemShortResponseDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import java.util.List;
 
 @Slf4j
-@Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemDtoMapper {
 
     private static final String OBJECT_MAPPED_MESSAGE = "Выполнено преобразование объекта из {} в {}";
 
-    public ItemResponseDto mapItemToResponseDto(Item item) {
+    public static ItemResponseDto mapItemToResponseDto(Item item) {
         return mapItemToResponseDto(item, null);
     }
 
-    public ItemResponseDto mapItemToResponseDto(Item item, List<CommentResponseDto> comments) {
+    public static ItemResponseDto mapItemToResponseDto(Item item, List<CommentResponseDto> comments) {
         return mapItemToResponseDto(item, null, null, comments);
     }
 
-    public ItemResponseDto mapItemToResponseDto(
+    public static ItemResponseDto mapItemToResponseDto(
             Item item,
             BookingShortResponseDto lastBooking,
             BookingShortResponseDto nextBooking,
@@ -32,6 +34,7 @@ public class ItemDtoMapper {
     ) {
         ItemResponseDto mappedItemResponseDto = new ItemResponseDto(
                 item.getId(),
+                item.getRequestId(),
                 item.getName(),
                 item.getDescription(),
                 item.isAvailable(),
@@ -44,9 +47,10 @@ public class ItemDtoMapper {
         return mappedItemResponseDto;
     }
 
-    public Item mapDtoToItem(ItemDto itemDto, User owner) {
+    public static Item mapDtoToItem(ItemDto itemDto, User owner) {
         Item mappedItem = new Item(
                 itemDto.getId(),
+                itemDto.getRequestId(),
                 owner,
                 itemDto.getName(),
                 itemDto.getDescription(),
@@ -54,6 +58,19 @@ public class ItemDtoMapper {
         );
         log.trace(OBJECT_MAPPED_MESSAGE, itemDto, mappedItem);
         return mappedItem;
+    }
+
+    public static ItemShortResponseDto mapItemToShortResponseDto(Item item) {
+        ItemShortResponseDto mappedShortResponseDto = new ItemShortResponseDto(
+                item.getId(),
+                item.getRequestId(),
+                item.getName(),
+                item.getDescription(),
+                item.isAvailable(),
+                item.getOwner().getId()
+        );
+        log.trace(OBJECT_MAPPED_MESSAGE, item, mappedShortResponseDto);
+        return mappedShortResponseDto;
     }
 
 }

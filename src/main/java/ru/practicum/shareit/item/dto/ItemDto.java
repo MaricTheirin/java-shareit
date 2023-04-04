@@ -13,6 +13,8 @@ public class ItemDto {
 
     private final long id;
 
+    private final Long requestId;
+
     @NotBlank(groups = Create.class, message = "Невозможно сохранить предмет с пустым наименованием")
     private final String name;
 
