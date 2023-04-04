@@ -58,9 +58,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         log.debug("Пользователь с ID = {} запросил список своих запросов на предметы", userId);
         checkIfUserExist(userId);
 
-        List<ItemRequest> foundRequests = itemRequestRepository
-                .findAllByUserIdOrderByCreatedDesc(userId)
-                .orElseThrow(ItemRequestNotFoundException::new);
+        List<ItemRequest> foundRequests = itemRequestRepository.findAllByUserIdOrderByCreatedDesc(userId);
 
         log.trace("Получен список запросов: {}", foundRequests);
         return addItemsAndMapToItemResponseDtoList(foundRequests);
@@ -75,8 +73,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkIfUserExist(userId);
 
         List<ItemRequest> foundRequests = itemRequestRepository
-                .findAllByUserIdNotOrderByCreatedDesc(userId, PageRequest.of(from, size))
-                .orElseThrow(ItemRequestNotFoundException::new);
+                .findAllByUserIdNotOrderByCreatedDesc(userId, PageRequest.of(from, size));
+
         log.trace("Получен список запросов: {}", foundRequests);
 
         return addItemsAndMapToItemResponseDtoList(foundRequests);

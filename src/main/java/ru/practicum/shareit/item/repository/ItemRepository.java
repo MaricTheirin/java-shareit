@@ -11,9 +11,9 @@ import java.util.Optional;
 @Validated
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Optional<Item> getItemByIdEqualsAndOwnerIdEquals(Long id, Long ownerId);
+    Item getItemByIdEqualsAndOwnerIdEquals(Long id, Long ownerId);
 
-    Optional<List<Item>> findAllByOwnerIdOrderByIdAsc(Long ownerId);
+    List<Item> findAllByOwnerIdOrderByIdAsc(Long ownerId);
 
     @Query("SELECT new ru.practicum.shareit.item.model.Item(it.id, it.requestId, u, it.name, it.description, it.available) " +
             "FROM Item AS it " +

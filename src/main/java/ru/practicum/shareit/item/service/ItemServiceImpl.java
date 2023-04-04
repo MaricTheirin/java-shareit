@@ -59,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Запрошено обновление объекта с id = {} ({}) для пользователя с id = {}", itemId, itemDto, userId);
 
         Item savedItem =
-                itemRepository.getItemByIdEqualsAndOwnerIdEquals(itemId, userId).orElseThrow(ItemNotFoundException::new);
+                itemRepository.getItemByIdEqualsAndOwnerIdEquals(itemId, userId);
         updateItemFields(userId, savedItem, itemDto);
         log.trace("Сохранённый предмет: {}", savedItem);
         return mapItemToResponseDto(savedItem, userId);
@@ -71,8 +71,7 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Для пользователя с id = {} удаляется предмет с id = {}", userId, itemId);
 
         Item itemToDelete = itemRepository
-                .getItemByIdEqualsAndOwnerIdEquals(itemId, userId)
-                .orElseThrow(ItemNotFoundException::new);
+                .getItemByIdEqualsAndOwnerIdEquals(itemId, userId);
         itemRepository.delete(itemToDelete);
         log.trace("Выполнено удаление предмета: {}", itemToDelete);
         return mapItemToResponseDto(itemToDelete, userId);
@@ -96,8 +95,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemResponseDto> findAll(Long userId) {
         log.debug("Для пользователя с id = {} запрошен список всех предметов", userId);
 
-        List<Item> allUserItems =
-                itemRepository.findAllByOwnerIdOrderByIdAsc(userId).orElseThrow(ItemNotFoundException::new);
+        List<Item> allUserItems = itemRepository.findAllByOwnerIdOrderByIdAsc(userId);
         log.trace("Получен массив предметов: {}", allUserItems);
         return new ArrayList<>(mapItemsToResponseDto(allUserItems).values());
 
