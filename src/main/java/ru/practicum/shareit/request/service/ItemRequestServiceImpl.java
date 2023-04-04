@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.dto.ItemShortResponseDto;
 import ru.practicum.shareit.item.mapper.ItemDtoMapper;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
@@ -26,6 +27,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     @Transactional
@@ -93,8 +95,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 )).collect(Collectors.toList());
     }
 
-    private List<ItemShortResponseDto> findItemsForItemRequest(long itemRequestId) {
-        return itemRequestRepository.findAllByItemRequestIdIn(Set.of(itemRequestId))
+    private List<ItemShortResponseDto> findItemsForItemRequest(Long itemRequestId) {
+        return itemRepository
+                .findAllItemsByItemRequestIdIn(Set.of(itemRequestId))
                 .stream()
                 .map(ItemDtoMapper::mapItemToShortResponseDto)
                 .collect(Collectors.toList());
@@ -105,8 +108,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private Map<Long, List<ItemShortResponseDto>> findItemsForItemRequests(Set<Long> itemRequestsIds) {
-        return itemRequestRepository
-                .findAllByItemRequestIdIn(itemRequestsIds)
+        return itemRepository
+                .findAllItemsByItemRequestIdIn(itemRequestsIds)
                 .stream()
                 .map(ItemDtoMapper::mapItemToShortResponseDto)
                 .collect(Collectors.groupingBy(ItemShortResponseDto::getRequestId, Collectors.toList()));
