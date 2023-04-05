@@ -1,15 +1,13 @@
 package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
-import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.service.validation.Create;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/requests")
@@ -17,31 +15,31 @@ import java.util.List;
 @Validated
 public class ItemRequestController {
 
-    private final ItemRequestService itemRequestService;
+    private final ItemRequestClient itemRequestClient;
 
     @PostMapping
-    ItemRequestResponseDto createRequest(
+    ResponseEntity<Object> createRequest(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @Validated(value = Create.class) @RequestBody ItemRequestDto requestDto
     ) {
-        return itemRequestService.create(userId, requestDto);
+        return itemRequestClient.create(userId, requestDto);
     }
 
     @GetMapping("/{requestId}")
-    ItemRequestResponseDto getRequestById(
+    ResponseEntity<Object> getRequestById(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long requestId
     ) {
-        return itemRequestService.read(userId, requestId);
+        return itemRequestClient.read(userId, requestId);
     }
 
     @GetMapping
-    List<ItemRequestResponseDto> readUserRequests(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemRequestService.readUserRequests(userId);
+    ResponseEntity<Object> readUserRequests(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemRequestClient.readUserRequests(userId);
     }
 
     @GetMapping("/all")
-    List<ItemRequestResponseDto> readAllUsersRequests(
+    ResponseEntity<Object> readAllUsersRequests(
             @RequestHeader("X-Sharer-User-Id")
             Long userId,
             @PositiveOrZero(message = "Начальная позиция должна быть не меньше 0")
@@ -50,7 +48,7 @@ public class ItemRequestController {
             @Positive(message = "Размер выдачи должен быть больше 0") @RequestParam(name = "size", defaultValue = "20")
             int size
     ) {
-        return itemRequestService.readAllUsersRequests(userId, from, size);
+        return itemRequestClient.readAllUsersRequests(userId, from, size);
     }
 
 }

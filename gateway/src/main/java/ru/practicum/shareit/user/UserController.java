@@ -1,50 +1,48 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.service.validation.Create;
 import ru.practicum.shareit.service.validation.Update;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserResponseDto;
-import ru.practicum.shareit.user.service.UserService;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserClient userClient;
 
     @PostMapping
-    public UserResponseDto create(
+    public ResponseEntity<Object> create(
             @Validated(Create.class) @RequestBody UserDto userDto
     ) {
-        return userService.create(userDto);
+        return userClient.create(userDto);
     }
 
     @GetMapping("/{userId}")
-    public UserResponseDto read(@PathVariable Long userId) {
-        return userService.read(userId);
+    public ResponseEntity<Object> read(@PathVariable Long userId) {
+        return userClient.read(userId);
     }
 
     @PatchMapping("/{userId}")
-    public UserResponseDto update(
+    public ResponseEntity<Object> update(
             @PathVariable Long userId,
             @Validated(Update.class) @RequestBody UserDto userDto
     ) {
-        return userService.update(userId, userDto);
+        return userClient.update(userId, userDto);
     }
 
     @DeleteMapping("/{userId}")
-    public UserResponseDto delete(@PathVariable Long userId) {
-        return userService.delete(userId);
+    public ResponseEntity<Object> delete(@PathVariable Long userId) {
+        return userClient.delete(userId);
     }
 
-    @GetMapping()
-    public List<UserResponseDto> findAll() {
-        return userService.findAll();
+    @GetMapping
+    public ResponseEntity<Object> findAll() {
+        return userClient.findAll();
     }
 
 }
