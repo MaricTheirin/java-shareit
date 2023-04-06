@@ -2,13 +2,13 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.service.validation.Create;
-
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -62,7 +62,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> findAvailableItemsBySearchQuery(
-            @RequestParam("text") String text,
+            @Length(min = 1) @RequestParam("text") String text,
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PositiveOrZero @RequestParam(defaultValue = "0") long from,
             @Positive @RequestParam(defaultValue = "20") long size

@@ -20,7 +20,7 @@ public class ItemClient extends BaseClient {
 
     @Autowired
     public ItemClient(
-            @Value("{shareit-server.url") String serverUrl,
+            @Value("${shareit-server.url}") String serverUrl,
             RestTemplateBuilder builder
     ) {
         super(
