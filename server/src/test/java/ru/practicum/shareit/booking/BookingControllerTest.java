@@ -71,7 +71,7 @@ public class BookingControllerTest {
     @Test
     public void bookTest() throws Exception {
         Mockito
-                .when(bookingController.book(Mockito.anyLong(), Mockito.any(BookingDto.class)))
+                .when(bookingController.bookItem(Mockito.anyLong(), Mockito.any(BookingDto.class)))
                 .thenReturn(responseDto);
 
         mockMvc.perform(post("/bookings")
