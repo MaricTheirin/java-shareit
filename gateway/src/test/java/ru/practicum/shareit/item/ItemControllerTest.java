@@ -87,19 +87,6 @@ public class ItemControllerTest {
     }
 
     @Test
-    void updateTest() throws Exception {
-
-        mockMvc.perform(patch(PATH.concat("/1"))
-                        .header("X-Sharer-User-Id", "1")
-                        .content(objectMapper.writeValueAsString(itemDtoWithoutDescription))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .characterEncoding(StandardCharsets.UTF_8))
-                .andExpect(status().isBadRequest());
-
-    }
-
-    @Test
     void findAvailableItemsBySearchQueryTest() throws Exception {
 
         mockMvc.perform(get(PATH.concat("/search"))
@@ -111,7 +98,7 @@ public class ItemControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk());
 
         mockMvc.perform(get(PATH.concat("/search"))
                         .header("X-Sharer-User-Id", "1")

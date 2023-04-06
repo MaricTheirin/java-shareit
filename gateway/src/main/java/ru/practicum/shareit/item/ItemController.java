@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +11,7 @@ import ru.practicum.shareit.service.validation.Create;
 import ru.practicum.shareit.service.validation.Update;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/items")
@@ -64,13 +64,15 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> findAvailableItemsBySearchQuery(
-            @Length(min = 1) @RequestParam("text") String text,
+            @RequestParam("text") String text,
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PositiveOrZero @RequestParam(defaultValue = "0") long from,
             @Positive @RequestParam(defaultValue = "20") long size
-
     ) {
         log.info("Пользователь с id={} ищет предметы по запросу \"{}\" с разбивкой [{},{}]", userId, text, from, size);
+        if (text.length() == 0) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
         return itemClient.findAvailableItemsBySearchQuery(text, userId, from, size);
     }
 
