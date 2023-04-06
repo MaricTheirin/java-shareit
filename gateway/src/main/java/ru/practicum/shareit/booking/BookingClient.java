@@ -30,7 +30,7 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getOwnBookings(long userId, BookingState state, Integer from, Integer size) {
+    public ResponseEntity<Object> findOwnBookings(long userId, BookingState state, Integer from, Integer size) {
         Map<String, Object> parameters = Map.of(
                 "state", state.name(),
                 "from", from,
