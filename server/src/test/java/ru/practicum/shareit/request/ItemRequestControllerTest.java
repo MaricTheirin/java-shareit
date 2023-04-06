@@ -40,7 +40,6 @@ public class ItemRequestControllerTest {
 
     private final User user = new User(1L, "user#1", "user1@server.com");
     private final ItemRequestDto itemRequestDto = new ItemRequestDto("Request#1_description");
-    private final ItemRequestDto itemRequestTooShortDto = new ItemRequestDto("");
     private final ItemRequest itemRequest = new ItemRequest(
             1L, user, itemRequestDto.getDescription(), LocalDateTime.now().withNano(0)
     );
@@ -64,13 +63,6 @@ public class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.description", Is.is(itemRequestResponseDto.getDescription())))
                 .andExpect(jsonPath("$.items.size()", Is.is(itemRequestResponseDto.getItems().size())));
 
-        mockMvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", "1")
-                        .content(objectMapper.writeValueAsString(itemRequestTooShortDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .characterEncoding(StandardCharsets.UTF_8))
-                .andExpect(status().isBadRequest());
     }
 
     @Test

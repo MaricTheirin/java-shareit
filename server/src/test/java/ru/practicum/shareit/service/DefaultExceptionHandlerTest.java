@@ -32,27 +32,6 @@ public class DefaultExceptionHandlerTest {
 
     private final UserDto userDto = new UserDto(1L, "User#1", "user1@server.com");
     private final User user = UserDtoMapper.mapDtoToUser(userDto);
-    private final UserResponseDto userResponseDto = UserDtoMapper.mapUserToResponseDto(user);
-
-    @Test
-    void testExceptionHandler_handleMethodArgumentNotValidException() throws Exception {
-
-        mvc.perform(MockMvcRequestBuilders.get("/bookings")
-                    .header("X-Sharer-User-Id", "1")
-                    .param("from", "-1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .characterEncoding(StandardCharsets.UTF_8)
-                ).andExpect(status().isBadRequest());
-
-        mvc.perform(MockMvcRequestBuilders.get("/bookings")
-                .header("X-Sharer-User-Id", "1")
-                .param("size", "-1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding(StandardCharsets.UTF_8)
-        ).andExpect(status().isBadRequest());
-    }
 
     @Test
     void testExceptionHandler_handleMissingRequestHeaderException() throws Exception {
