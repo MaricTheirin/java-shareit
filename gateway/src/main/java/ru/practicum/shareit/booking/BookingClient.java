@@ -49,7 +49,8 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> review(Long userId, long bookingId, Boolean approved) {
-        return patch("/" + bookingId + "?approved=" + approved, userId);
+        Map<String, Object> parameters = Map.of("approved", approved);
+        return patch("/" + bookingId + "?approved={approved}", userId, parameters, null);
     }
 
     public ResponseEntity<Object> findOwnItemsBookings(Long userId, BookingState state, int from, int size) {
