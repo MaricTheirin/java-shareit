@@ -13,6 +13,7 @@ services:
       - POSTGRES_DB=shareit
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
+      - TZ=Europe/Moscow
 
   server:
     build: ./server
@@ -25,6 +26,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ShareItDb:5432/shareit
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
+      - TZ=Europe/Moscow
 
   gateway:
     build: ./gateway
@@ -35,3 +37,4 @@ services:
       - server
     environment:
       - SHAREIT_SERVER_URL=http://ShareItServer:9090
+      - TZ=Europe/Moscow
