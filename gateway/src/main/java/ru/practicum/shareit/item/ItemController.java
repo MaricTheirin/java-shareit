@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.service.validation.Create;
+import ru.practicum.shareit.service.validation.Update;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+@Validated
 @Slf4j
 public class ItemController {
 
@@ -42,7 +44,7 @@ public class ItemController {
     public ResponseEntity<Object> update(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long itemId,
-            @RequestBody ItemDto itemDto
+            @Validated(Update.class) @RequestBody ItemDto itemDto
     ) {
         log.info("Пользователь с id={} запросил обновление предмета с id={} на {}", userId, itemId, itemDto);
         return itemClient.updateItem(userId, itemId, itemDto);
