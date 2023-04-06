@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import javax.validation.constraints.PositiveOrZero;
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class ItemRequestController {
 
     private final ItemRequestClient itemRequestClient;
@@ -22,6 +24,7 @@ public class ItemRequestController {
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @Validated(value = Create.class) @RequestBody ItemRequestDto requestDto
     ) {
+        log.info("Пользователь с id={} создал запрос на подбор вещи {}", userId, requestDto);
         return itemRequestClient.create(userId, requestDto);
     }
 
@@ -30,11 +33,13 @@ public class ItemRequestController {
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long requestId
     ) {
+        log.info("Пользователь с id={} запросил информацию о подборе вещи с id={}", userId, requestId);
         return itemRequestClient.read(userId, requestId);
     }
 
     @GetMapping
     ResponseEntity<Object> readUserRequests(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        log.info("Пользователь с id={} запросил список своих обращений на подбор вещей", userId);
         return itemRequestClient.readUserRequests(userId);
     }
 
@@ -48,6 +53,9 @@ public class ItemRequestController {
             @Positive(message = "Размер выдачи должен быть больше 0") @RequestParam(name = "size", defaultValue = "20")
             int size
     ) {
+        log.info("Пользователь с id={} запросил информацию о всех заявках на подбор с разбивкой [{},{}]",
+                userId, from, size
+        );
         return itemRequestClient.readAllUsersRequests(userId, from, size);
     }
 
