@@ -66,7 +66,7 @@ public class DefaultExceptionHandler {
     ) {
         logException(exception, request);
         return new ResponseEntity<>(
-                new ExceptionMessage("Некорректный запрос", request.getRequestURI()),
+                new ExceptionMessage(exception.getMessage(), request.getRequestURI()),
                 HttpStatus.BAD_REQUEST
         );
     }
