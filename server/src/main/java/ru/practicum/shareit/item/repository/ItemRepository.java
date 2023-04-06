@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.repository;
 
-import org.hibernate.validator.constraints.Length;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.validation.annotation.Validated;
@@ -24,7 +23,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             ")"
     )
     List<Item> findAllAvailableAndContainingQueryIgnoreCase(
-            @Length(min = 1, message = "Запрос не может быть пустым") String searchQuery
+            String searchQuery
     );
 
     Boolean existsItemByIdAndAvailableIsTrue(Long itemId);

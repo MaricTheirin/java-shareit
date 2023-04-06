@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.model;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.validator.constraints.Length;
 import ru.practicum.shareit.user.model.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -25,7 +24,6 @@ public class ItemRequest {
     @ToString.Exclude
     private User user;
 
-    @Length(max = 512)
     @Column(nullable = false)
     private String description;
 

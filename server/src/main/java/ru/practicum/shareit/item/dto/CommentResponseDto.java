@@ -12,9 +12,13 @@ import java.time.LocalDateTime;
 public class CommentResponseDto {
 
     private long id;
+
     private String text;
+
     private long itemId;
+
     private String authorName;
+
     private LocalDateTime created;
 
 }

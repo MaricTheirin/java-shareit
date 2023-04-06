@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.model;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.validator.constraints.Length;
 import ru.practicum.shareit.user.model.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -20,7 +19,6 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Length(max = 256)
     private String text;
 
     @ManyToOne(optional = false)
