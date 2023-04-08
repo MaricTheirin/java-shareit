@@ -15,7 +15,7 @@ import java.lang.annotation.*;
 
 public @interface BookingStartBeforeEndValid {
     //Сообщение, выводимое при валидации
-    String message() default "Дата начала бронирования не может быть позже даты окончания";
+    String message() default "Период бронирования задан некорректно";
     Class<?>[] groups() default{};
     Class<? extends Payload>[] payload() default {};
 }

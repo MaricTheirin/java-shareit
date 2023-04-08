@@ -17,11 +17,9 @@ public class BookItemRequestDto {
 	@NotNull(groups = Create.class, message = "Необходимо указать ID предмета")
 	private final Long itemId;
 
-	@NotNull(groups = Create.class, message = "Невозможно создать бронирование без даты начала")
 	@FutureOrPresent(groups = Create.class, message = "Начало бронирования не может быть в прошлом")
 	private final LocalDateTime start;
 
-	@NotNull(groups = Create.class, message = "Невозможно создать бронирование без даты окончания")
 	@Future(groups = Create.class, message = "Окончание бронирования не может быть в прошлом")
 	private final LocalDateTime end;
 
