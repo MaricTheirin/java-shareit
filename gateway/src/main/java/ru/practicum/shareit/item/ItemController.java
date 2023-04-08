@@ -71,7 +71,7 @@ public class ItemController {
             @Positive @RequestParam(defaultValue = "20") long size
     ) {
         log.info("Пользователь с id={} ищет предметы по запросу \"{}\" с разбивкой [{},{}]", userId, text, from, size);
-        if (text.length() == 0) {
+        if (text.isBlank()) {
             return ResponseEntity.ok(Collections.emptyList());
         }
         return itemClient.findAvailableItemsBySearchQuery(text, userId, from, size);
