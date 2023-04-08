@@ -7,9 +7,11 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ru.practicum.shareit.service.validation.Create;
+import ru.practicum.shareit.booking.validator.BookingStartBeforeEndValid;
 
 @Getter
 @AllArgsConstructor
+@BookingStartBeforeEndValid
 public class BookItemRequestDto {
 
 	@NotNull(groups = Create.class, message = "Необходимо указать ID предмета")
