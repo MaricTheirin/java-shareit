@@ -43,6 +43,14 @@ paths:
                 $ref: '#/components/schemas/BookingItemResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/bookings"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /bookings/owner:
     get:
       summary: "Получить список запросов на бронирование своих вещей"
@@ -88,6 +96,14 @@ paths:
                   $ref: '#/components/schemas/BookingItemResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/bookings/owner"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /bookings/{bookingId}:
     patch:
       summary: "Подтвердить или отменить запрос на бронирование"
@@ -124,8 +140,24 @@ paths:
                 $ref: '#/components/schemas/BookingResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/bookings/1"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
         "404":
           description: "ID не найден"
+          content:
+            application/json:
+              example:
+                path: "/bookings/999"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "ID не найден"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /requests:
     post:
       summary: "Создать запрос на бронирование"
@@ -149,6 +181,14 @@ paths:
                 $ref: '#/components/schemas/ItemRequestResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/requests"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /requests/all:
     get:
       summary: "Получить список всех запросов"
@@ -188,6 +228,14 @@ paths:
                   $ref: '#/components/schemas/ItemRequestResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/requests/all"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /requests/{requestId}:
     get:
       summary: "Получить запрос по ID"
@@ -218,8 +266,24 @@ paths:
                 $ref: '#/components/schemas/ItemRequestResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/requests/1"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
         "404":
           description: "ID не найден"
+          content:
+            application/json:
+              example:
+                path: "/requests/999"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "ID не найден"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /items:
     post:
       summary: "Создать предмет"
@@ -248,6 +312,14 @@ paths:
                 $ref: '#/components/schemas/ItemResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/items"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /items/search:
     get:
       summary: "Найти доступные для бронирования предметы"
@@ -272,6 +344,14 @@ paths:
                   $ref: '#/components/schemas/ItemResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/items/search"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /items/{itemId}:
     patch:
       summary: "Обновить"
@@ -307,8 +387,24 @@ paths:
                 $ref: '#/components/schemas/ItemResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/items/1"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
         "404":
           description: "ID не найден"
+          content:
+            application/json:
+              example:
+                path: "/items/999"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "ID не найден"
+              schema:
+                $ref: '#/components/schemas/ApiError'
     delete:
       summary: "Удалить предмет"
       operationId: "delete"
@@ -338,8 +434,24 @@ paths:
                 $ref: '#/components/schemas/ItemResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/items/1"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
         "404":
           description: "ID не найден"
+          content:
+            application/json:
+              example:
+                path: "/items/999"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "ID не найден"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /items/{itemId}/comment:
     post:
       summary: "Оставить отзыв"
@@ -375,8 +487,24 @@ paths:
                 $ref: '#/components/schemas/CommentResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/items/1/comment"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
         "404":
           description: "ID не найден"
+          content:
+            application/json:
+              example:
+                path: "/items/999/comment"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "ID не найден"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /users:
     post:
       summary: "Создать пользователя"
@@ -397,6 +525,14 @@ paths:
                 $ref: '#/components/schemas/UserResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/users"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Нарушение безопасности"
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /users/{userId}:
     delete:
       summary: "Удалить пользователя"
@@ -420,8 +556,24 @@ paths:
                 $ref: '#/components/schemas/UserResponseDto'
         "400":
           description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              example:
+                path: "/users/1"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Ошибка при проверке полей"
+              schema:
+                $ref: '#/components/schemas/ApiError'
         "404":
           description: "ID не найден"
+          content:
+            application/json:
+              example:
+                path: "/users/999"
+                localDateTime: "2023-06-29 21:17:38"
+                error: "Ошибка при проверке полей"
+              schema:
+                $ref: '#/components/schemas/ApiError'
 components:
   schemas:
     UserCreateDto:
@@ -653,3 +805,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ItemResponseDto'
+    ApiError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: "URL, при котором возникла ошибка"
+          example: '/admin/users'
+        localDateTime:
+          type: string
+          description: "Дата и время возникновения ошибки"
+          example: '2023-06-29 21:17:38'
+        error:
+          type: string
+          description: "Текст ошибки"
+          example: "Not Found"
